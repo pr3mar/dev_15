@@ -17,11 +17,12 @@ class HierarchicalClustering:
             for j in i:
                 print j,
             print
-
-        # for x in self.clusters:
-        #     for y in x:
-        #         print self.countries[y], ',',
-        #     print
+    def printClusters(self):
+        print
+        for x in self.clusters:
+            for y in x:
+                print self.countries[y], ',',
+            print
     def __init__(self, fn, linkage="average"):
         # copy 76:147
         # serbia & montenegro = 38
@@ -55,16 +56,8 @@ class HierarchicalClustering:
         joining = []
         while len(self.clusters) > 1:  # and i < 2:
             dist, pair = self.closes_clusters()
-            # print "pairs:"
-            # for x in pair:
-            #     for y in x:
-            #         print self.countries[y],
-            #     print
-            # print "clusters:"
             self.clusters = [x for x in self.clusters if x not in pair] + [pair[0] + pair[1]]
-            # print "\n"
-            # print self.clusters
-            # print len(self.clusters)
+            self.printClusters()
 
 
 # test = HierarchicalClustering("eurovision-final.csv")
