@@ -21,7 +21,7 @@ class HierarchicalClustering:
         print
         for x in self.clusters:
             for y in x:
-                print self.countries[y], ',',
+                print self.countries[y]+',',
             print
     def __init__(self, fn, linkage="average"):
         # copy 76:147
@@ -54,11 +54,16 @@ class HierarchicalClustering:
 
     def run_clustering(self):
         joining = []
+        tmp = self.clusters
         while len(self.clusters) > 1:  # and i < 2:
             dist, pair = self.closes_clusters()
+            #TODO make lists of tuples!
+            tmp = [x for x in tmp if x not in pair] + [[pair[0]] + [pair[1]]]
+            joining.append(tmp)
             self.clusters = [x for x in self.clusters if x not in pair] + [pair[0] + pair[1]]
-            self.printClusters()
-
+            # self.printClusters()
+        for i in  joining:
+            print i
 
 # test = HierarchicalClustering("eurovision-final.csv")
 test = HierarchicalClustering("eurovision-final.csv")
