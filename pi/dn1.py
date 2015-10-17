@@ -17,6 +17,7 @@ class HierarchicalClustering:
             for j in i:
                 print j,
             print
+
     def printClusters(self):
         print
         for x in self.clusters:
@@ -71,11 +72,20 @@ class HierarchicalClustering:
     def run_clustering(self):
         while len(self.clusters) > 1:  # and i < 2:
             dist, pair = self.closes_clusters()
-            # self.clusters = [x for x in self.clusters if x not in pair] + [pair[0] + pair[1]]
             self.updateJoints(pair, dist)
-            # print self.clusters
-        for i in self.joining:
-            print i
+        #     self.printClusters()
+        # for i in self.joining:
+        #     print i
+        self.drawDendrogram(self.joining[0], 0)
+
+    def drawDendrogram(self, drawCluster, level):
+        if len(drawCluster) == 2:
+            print level, level * "-", drawCluster
+        else:
+            self.drawDendrogram(drawCluster[0], level + 1)
+            print level, level * "-", drawCluster[2]
+            self.drawDendrogram(drawCluster[1], level + 1)
+
 
 # test = HierarchicalClustering("eurovision-final.csv")
 test = HierarchicalClustering("eurovision-final.csv")
