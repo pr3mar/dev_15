@@ -16,7 +16,7 @@
 % % erode && dilate (opening)
 % figure(1); subplot(1,5,5);
 % imagesc(imdilate(imerode(mask, structuring_element),structuring_element)); axis equal; axis tight; title('erode & dilate');
-
+% 
 % % (b) - bird mask
 % bird = rgb2gray(imread('bird.jpg'));
 % threshold = threshold_otsu(bird);
@@ -40,10 +40,11 @@ eagle = imread('eagle.jpg');
 eagle_gray = rgb2gray(eagle);
 threshold = threshold_otsu(eagle_gray);
 eagle_mask = eagle_gray > threshold;
+figure(4); imagesc(eagle_mask); colormap gray; axis equal; axis tight;
 eagle_se = strel('diamond', 6);
 % open image, negate the result
-eagle_mask = not(imdilate(imerode(eagle_mask, eagle_mask), eagle_se));
-% eagle_mask = imerode(imdilate(eagle_mask, eagle_mask),eagle_mask);
-figure(4); imagesc(eagle_mask); axis equal; axis tight; title('closed');
-eagle_masked = immask(eagle, eagle_mask);
-figure(5); imshow(eagle_masked);
+% eagle_mask = negate(imdilate(imerode(eagle_mask, eagle_mask), eagle_se));
+eagle_mask = negate(imerode(imdilate(eagle_mask, eagle_mask),eagle_mask));
+figure(5); imagesc(eagle_mask); colormap gray; axis equal; axis tight; title('closed');
+% eagle_masked = immask(eagle, eagle_mask);
+% figure(5); imshow(eagle_masked); 
