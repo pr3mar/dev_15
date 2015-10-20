@@ -1,13 +1,19 @@
-% up_rgb = imread('up.jpg');
-% up_gray = rgb2gray(up_rgb);
-% % multitresholding using otsu's method
-% th = multithresh(up_gray, 2);
-% up_mask = up_gray < th(1);
-% up_se = strel('disk', 10);
-% up_mask = imerode(imdilate(up_mask,up_se),up_se);
-% figure(1) ; imagesc(up_mask); colormap gray
-% up_masked = immask(up_rgb, up_mask);
-% figure(1) ; imagesc(up_masked);
+up_rgb = imread('up.jpg');
+up_gray = rgb2gray(up_rgb);
+% multitresholding using otsu's method
+th = multithresh(up_gray, 2);
+up_mask = up_gray < th(1);
+up_se = strel('disk', 10);
+up_mask = imerode(imdilate(up_mask,up_se),up_se);
+figure(1) ; imagesc(up_mask); colormap gray
+up_masked = immask(up_rgb, up_mask);
+figure(1) ; imagesc(up_masked);
+up_array = up_rgb(:);
+[H, bins] = myhist(up_rgb, 10);
+c = hist(double(up_rgb), 10);
+figure(5); clf ; subplot(1,2,1); bar(H, bins);
+subplot(1,2,2); bar(c);
+
 
 stones = imread('stones.jpg');
 stones_gray = rgb2gray(stones);
