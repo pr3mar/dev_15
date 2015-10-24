@@ -1,9 +1,12 @@
 /**
  * Created by Power User on 22.10.2015.
  */
+
 var fileContent = "[nan]";
 var vertices = [];
 var triangles = [];
+
+var mvMatrix;
 
 function handleFiles(event) {
     var file = event.target.files[0];
@@ -53,11 +56,35 @@ function parseElements(line) {
 }
 
 function castToGL(array) {
-    tmpVector = vec3.create();
+    tmpVector = vec4.create();
     for(i in array){
         tmpVector[i] = parseFloat(array[i]);
     }
+    tmpVector[3] = 1;
     return tmpVector;
 }
 
-
+//<mat4> rotateX(<float> alpha);
+function rotateX(alpha) {
+    return mvMatrix;
+}
+//<mat4> rotateY(<float> alpha);
+function rotateY(alpha) {
+    return mvMatrix;
+}
+//<mat4> rotateZ(<float> alpha);
+function rotateZ(alpha) {
+    return mvMatrix;
+}
+//<mat4> translate(<float> dx, <float> dy, <float> dz);
+function translate(dx, dy, dz) {
+    return mvMatrix;
+}
+//<mat4> scale(<float> sx, <float> sy, <float> sz);
+function scale(sx, sy, sz) {
+    return mvMatrix;
+}
+//<mat4> perspective(<float> d); // primerna vrednost je d=4
+function perspective(d){
+    return mvMatrix;
+}
