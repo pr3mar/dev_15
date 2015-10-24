@@ -26,7 +26,8 @@ window.onload = function() {
 };
 
 function startWorking() {
-    result = parse(fileContent);
+    parse(fileContent);
+    mvMatrix = mat4.identity();
     console.log(vertices);
     console.log(triangles);
 }
@@ -37,8 +38,6 @@ function parse(fileContent) {
         if(x.length > 1)
             parseElements(x.split(" "));
     });
-    result = fileContent;
-    return result;
 }
 
 function parseElements(line) {
@@ -78,10 +77,20 @@ function rotateZ(alpha) {
 }
 //<mat4> translate(<float> dx, <float> dy, <float> dz);
 function translate(dx, dy, dz) {
+    var translateMatrix = mat4.identity();
+    traslateMatrix[0][3] = dx;
+    traslateMatrix[1][3] = dy;
+    traslateMatrix[2][3] = dz;
+    mat4.multiply(mvMatrix, traslateMatrix);
     return mvMatrix;
 }
 //<mat4> scale(<float> sx, <float> sy, <float> sz);
 function scale(sx, sy, sz) {
+    var translateMatrix = mat4.identity();
+    traslateMatrix[0][0] = sx;
+    traslateMatrix[1][1] = sy;
+    traslateMatrix[2][2] = sz;
+    mat4.multiply(mvMatrix, traslateMatrix);
     return mvMatrix;
 }
 //<mat4> perspective(<float> d); // primerna vrednost je d=4
