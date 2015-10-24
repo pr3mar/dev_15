@@ -7,7 +7,7 @@ var triangles = [];
 
 function handleFiles(event) {
     var file = event.target.files[0];
-    console.log(file);
+    //console.log(file);
     if(file.type.match(/text.*/)) {
         var reader = new FileReader();
         reader.onloadend = function() {
@@ -22,22 +22,13 @@ window.onload = function() {
     document.getElementById("fileChooser").addEventListener("change", handleFiles, false);
 };
 
-function parseElements(line) {
-    var identifier = line.shift();
-    switch(line.shift()) {
-        case "v":
-            vertices.push(line);
-            break;
-        case "f":
-            triangles.push(line);
-            break;
-        default :
-            console.log("error");
-    }
+function startWorking() {
+    result = parse(fileContent);
+    console.log(vertices);
+    console.log(triangles);
 }
 
 function parse(fileContent) {
-    console.log("parsing");
     lines = fileContent.split("\n");
     lines.forEach(function (x) {
         if(x.length > 1)
@@ -47,9 +38,26 @@ function parse(fileContent) {
     return result;
 }
 
-function startWorking() {
-    console.log("started working!!!");
-    result = parse(fileContent);
-    console.log(vertices);
-    console.log(triangles);
+function parseElements(line) {
+    var identifier = line.shift();
+    switch(identifier) {
+        case "v":
+            vertices.push(castToGL(line));
+            break;
+        case "f":
+            triangles.push(castToGL(line));
+            break;
+        default :
+            console.log("error");
+    }
 }
+
+function castToGL(array) {
+    tmpVector = vec3.create();
+    for(i in array){
+        tmpVector[i] = parseFloat(array[i]);
+    }
+    return tmpVector;
+}
+
+
