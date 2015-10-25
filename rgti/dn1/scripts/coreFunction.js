@@ -27,9 +27,20 @@ window.onload = function() {
 
 function startWorking() {
     parse(fileContent);
-    mvMatrix = mat4.identity();
-    console.log(vertices);
-    console.log(triangles);
+    mvMatrix = mat4.create();
+    //console.log(vertices);
+    //console.log(triangles);
+    for(var i = 0; i < vertices.length; i++) {
+        console.log(vertices[i]);
+        mvMatrix = scale(1/2, 1/2, 1/2);
+        var tmp = transform(mvMatrix, vertices[i]);
+        console.log(tmp);
+        mvMatrix = translate(10, 10, 10);
+        vertices[i] = transform(mvMatrix, vertices[i]);
+        console.log(vertices[i]);
+        console.log();
+        mvMatrix = mat4.create();
+    }
 }
 
 function parse(fileContent) {
@@ -63,34 +74,63 @@ function castToGL(array) {
     return tmpVector;
 }
 
-//<mat4> rotateX(<float> alpha);
-function rotateX(alpha) {
-    return mvMatrix;
+function transform(matrix, vector) {
+    var transformation = vec4.create();
+    for(var i = 0; i < vector.length; i++) {
+        for(var j = 0; j < vector.length; j++) {
+            transformation[i] += matrix[i * vector.length + j] * vector[j];
+        }
+    }
+    return transformation;
 }
-//<mat4> rotateY(<float> alpha);
-function rotateY(alpha) {
-    return mvMatrix;
-}
-//<mat4> rotateZ(<float> alpha);
-function rotateZ(alpha) {
-    return mvMatrix;
-}
+
 //<mat4> translate(<float> dx, <float> dy, <float> dz);
 function translate(dx, dy, dz) {
-    var translateMatrix = mat4.identity();
-    traslateMatrix[0][3] = dx;
-    traslateMatrix[1][3] = dy;
-    traslateMatrix[2][3] = dz;
-    mat4.multiply(mvMatrix, traslateMatrix);
+    var translateMatrix = mat4.create();
+    translateMatrix[3] = dx;
+    translateMatrix[7] = dy;
+    translateMatrix[11] = dz;
+    //console.log(translateMatrix);
+    mat4.multiply(mvMatrix, mvMatrix, translateMatrix);
     return mvMatrix;
 }
 //<mat4> scale(<float> sx, <float> sy, <float> sz);
 function scale(sx, sy, sz) {
-    var translateMatrix = mat4.identity();
-    traslateMatrix[0][0] = sx;
-    traslateMatrix[1][1] = sy;
-    traslateMatrix[2][2] = sz;
-    mat4.multiply(mvMatrix, traslateMatrix);
+    var scaleMatrix = mat4.create();
+    scaleMatrix[0] = sx;
+    scaleMatrix[5] = sy;
+    scaleMatrix[10] = sz;
+    mat4.multiply(mvMatrix, mvMatrix, scaleMatrix);
+    return mvMatrix;
+}
+//<mat4> rotateX(<float> alpha);
+function rotateX(alpha) {
+    var rotateXMatrix = mat4.create();
+    rotateXMatrix[5] = Math.cos(alpha);
+    rotateXMatrix[6] = -Math.sin(alpha);
+    rotateXMatrix[9] = Math.cos(alpha);
+    rotateXMatrix[10] = Math.sin(alpha);
+    mat4.multiply(mvMatrix, mvMatrix, rotateXMatrix);
+    return mvMatrix;
+}
+//<mat4> rotateY(<float> alpha);
+function rotateY(alpha) {
+    var rotateYMatrix = mat4.create();
+    rotateYMatrix[0] = Math.cos(alpha);
+    rotateYMatrix[2] = Math.sin(alpha);
+    rotateYMatrix[8] = -Math.sin(alpha);
+    rotateYMatrix[10] = Math.cos(alpha);
+    mat4.multiply(mvMatrix, mvMatrix, rotateYMatrix);
+    return mvMatrix;
+}
+//<mat4> rotateZ(<float> alpha);
+function rotateZ(alpha) {
+    var rotateZMatrix = mat4.create();
+    rotateZMatrix[0] = Math.cos(alpha);
+    rotateZMatrix[1] = -Math.sin(alpha);
+    rotateZMatrix[4] = Math.cos(alpha);
+    rotateZMatrix[5] = Math.sin(alpha);
+    mat4.multiply(mvMatrix, mvMatrix, rotateZMatrix);
     return mvMatrix;
 }
 //<mat4> perspective(<float> d); // primerna vrednost je d=4
