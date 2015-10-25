@@ -9,6 +9,7 @@ var triangles = [];
 var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 var canvas;
+var context;
 
 window.onload = function() {
     document.getElementById("fileChooser").addEventListener("change", handleFiles, false);
@@ -60,14 +61,25 @@ function castToGL(array) {
 }
 
 function startWorking() {
+    mvMatrix = mat4.create();
+    vertices = [];
+    triangles = [];
     parse(fileContent);
-    pMatrix = perspective(8);
+    pMatrix = perspective(-4);
+    //mat4.multiply(pMatrix, pMatrix, translate(0, 1, 0));
+    //mat4.multiply(pMatrix, pMatrix, scale(0.2, 1, 10));
     var tmp = mat4.create();
     canvas = document.getElementById("drawingCanvas");
-    canvas = canvas.getContext("2d");
+    canvas.width  = 800;
+    canvas.height = 600;
+    context = canvas.getContext("2d");
     for(var i = 0; i < vertices.length; i++) {
         console.log(vertices[i]);
-        mat4.multiply(mvMatrix, mvMatrix, translate(2, 2, 2));
+        mat4.multiply(mvMatrix, mvMatrix, translate(1, 1, 1));
+        mat4.multiply(mvMatrix, mvMatrix, scale(100, 100, 10));
+        //mat4.multiply(mvMatrix, mvMatrix, rotateY(45));
+        //mat4.multiply(mvMatrix, mvMatrix, rotateX(45));
+        //mat4.multiply(mvMatrix, mvMatrix, rotateZ(90));
         mat4.multiply(tmp, pMatrix, mvMatrix);
         vertices[i] = transform(tmp, vertices[i]);
         console.log(vertices[i]);
@@ -84,6 +96,12 @@ function startWorking() {
         console.log();
         mvMatrix = mat4.create();
     }
+
+    //context.beginPath();
+    //context.moveTo(canvas.width/2,canvas.height/2);
+    //context.lineTo(canvas.width/2 + 100,canvas.height/2 + 100);
+    //context.stroke();
+
     for(var i = 0; i < triangles.length; i++) {
         var current = triangles[i];
         drawLine(current[0] - 1, current[1] - 1);
@@ -93,10 +111,10 @@ function startWorking() {
 }
 
 function drawLine(dot1, dot2) {
-    canvas.beginPath();
-    canvas.moveTo(vertices[dot1][0] * 100, vertices[dot1][1] * 100);
-    canvas.lineTo(vertices[dot2][0] * 100, vertices[dot2][1] * 100);
-    canvas.stroke();
+    context.beginPath();
+    context.moveTo(canvas.width/2 - vertices[dot1][0], canvas.height/2 - vertices[dot1][1]);
+    context.lineTo(canvas.width/2 - vertices[dot2][0], canvas.height/2 - vertices[dot2][1]);
+    context.stroke();
 }
 
 function transform(matrix, vector) {
