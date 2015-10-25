@@ -7,10 +7,49 @@
     <!--<script src="https://cdn.jsdelivr.net/glmatrix/2.2.1/gl-matrix-min.js"></script>-->
     <script src="libs/gl-matrix-min.js"></script>
     <script src="scripts/coreFunction.js"></script>
+    <style>
+        #content {
+            width: 100%;
+            text-align: center;
+        }
+
+        canvas {
+            display: inline;
+            border: 1px solid black;
+        }
+
+        h1 {
+            text-align: left;
+        }
+
+        h2 {
+            text-align: left;
+        }
+
+        ul {
+            text-align: left;
+        }
+
+        td {
+            width: 200px;
+        }
+
+        #loadingtext {
+            position:absolute;
+            top:250px;
+            left:150px;
+            font-size:2em;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <input type="file" id="fileChooser" name="files">
     <!--<pre id="fileDisplayArea">this is pre </pre>-->
-    <canvas width="1000px" height="1000px"></canvas>
+    <div id="content">
+        <canvas id="drawingCanvas" width="800px" height="600px">
+            No <code>&lt;canvas&gt;</code> suppport in your browser.
+        </canvas>
+    </div>
 </body>
 </html>
