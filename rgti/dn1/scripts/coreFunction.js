@@ -4,12 +4,85 @@
 
 var fileContent = "[nan]";
 var vertices = [];
+var transformed = [];
 var triangles = [];
 
 var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 var canvas;
 var context;
+
+function zx(e){
+    var charCode = e.which;
+    console.log(charCode);
+    switch (charCode) {
+        case 87:
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateX(6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 83:
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateX(-6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 68:
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateY(6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 65:
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateY(-6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 69:
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateZ(6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 81:
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateZ(-6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 38: // up arrow
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(0, -6, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 40: // down arrow
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(0, 6, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 39: // right arrow
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(6, 0, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 37: // left arrow
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(-6, 0, 0));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 107: // numpad +
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, scale(1.1, 1.1, 1.1));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 109: // numpad -
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, scale(1/1.1, 1/1.1, 1/1.1));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+
+        default:
+            return;
+    }
+    draw();
+}
+document.onkeydown =  zx;
 
 window.onload = function() {
     document.getElementById("fileChooser").addEventListener("change", handleFiles, false);
@@ -18,18 +91,19 @@ window.onload = function() {
 function handleFiles(event) {
     var file = event.target.files[0];
     //console.log(file);
-    if(file.type.match(/text.*/)) {
-        var reader = new FileReader();
-        reader.onloadend = function() {
-            //document.getElementById("fileDisplayArea").innerHTML = reader.result;
-            fileContent = reader.result;
-            startWorking();
-        };
-        reader.readAsText(file);
-    }
+    //if(file.type.match(/text.*/)) {
+    var reader = new FileReader();
+    reader.onloadend = function() {
+        //document.getElementById("fileDisplayArea").innerHTML = reader.result;
+        fileContent = reader.result;
+        startWorking();
+    };
+    reader.readAsText(file);
+    //}
 }
 
 function parse(fileContent) {
+    //console.log(fileContent);
     lines = fileContent.split("\n");
     lines.forEach(function (x) {
         if(x.length > 1)
@@ -47,7 +121,7 @@ function parseElements(line) {
             triangles.push(castToGL(line));
             break;
         default :
-            console.log("error");
+            //console.log("error");
     }
 }
 
@@ -64,6 +138,7 @@ function startWorking() {
     mvMatrix = mat4.create();
     vertices = [];
     triangles = [];
+    transformed = [];
     parse(fileContent);
     pMatrix = perspective(-4);
     //mat4.multiply(pMatrix, pMatrix, translate(0, 1, 0));
@@ -73,47 +148,41 @@ function startWorking() {
     canvas.width  = 800;
     canvas.height = 600;
     context = canvas.getContext("2d");
-    for(var i = 0; i < vertices.length; i++) {
-        console.log(vertices[i]);
-        mat4.multiply(mvMatrix, mvMatrix, translate(1, 1, 1));
-        mat4.multiply(mvMatrix, mvMatrix, scale(100, 100, 10));
-        //mat4.multiply(mvMatrix, mvMatrix, rotateY(45));
-        //mat4.multiply(mvMatrix, mvMatrix, rotateX(45));
-        //mat4.multiply(mvMatrix, mvMatrix, rotateZ(90));
-        mat4.multiply(tmp, pMatrix, mvMatrix);
-        vertices[i] = transform(tmp, vertices[i]);
-        console.log(vertices[i]);
-        //canvas = document.getElementById("drawingCanvas");
+    mat4.multiply(mvMatrix, mvMatrix, rotateZ(45));
+    mat4.multiply(mvMatrix, mvMatrix, rotateX(45));
+    //mat4.multiply(mvMatrix, mvMatrix, rotateY(45));
+    mat4.multiply(mvMatrix, mvMatrix, scale(10, 10, 10));
+    mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, -8));
+    draw();
+}
+
+function draw() {
+    if(vertices.length > 0 && triangles.length > 0) {
+        //canvas.log("draw");
+        //mat4.multiply(mvMatrix, mvMatrix, scale(100, 100, 100));
+        //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, -8));
         //console.log(mvMatrix);
-        //mvMatrix = scale(1/2, 1/2, 1/2);
-        //console.log(tmp);
-        //mvMatrix = translate(10, 10, 10);
-        //mvMatrix = scale(0.5, 0.5, 0.5);
-        //mvMatrix = perspective(4);
-        //console.log(vertices[i]);
-        //vertices[i] = transform(mvMatrix, vertices[i]);
-        //console.log(vertices[i]);
-        console.log();
-        mvMatrix = mat4.create();
-    }
-
-    //context.beginPath();
-    //context.moveTo(canvas.width/2,canvas.height/2);
-    //context.lineTo(canvas.width/2 + 100,canvas.height/2 + 100);
-    //context.stroke();
-
-    for(var i = 0; i < triangles.length; i++) {
-        var current = triangles[i];
-        drawLine(current[0] - 1, current[1] - 1);
-        drawLine(current[0] - 1, current[2] - 1);
-        drawLine(current[1] - 1, current[2] - 1);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        for(var i = 0; i < vertices.length; i++) {
+            //console.log(vertices[i]);
+            transformed.push(transform(mvMatrix, vertices[i]));
+            //console.log(vertices[i]);
+        }
+        for(var i = 0; i < triangles.length; i++) {
+            var current = triangles[i];
+            drawLine(current[0] - 1, current[1] - 1);
+            drawLine(current[0] - 1, current[2] - 1);
+            drawLine(current[1] - 1, current[2] - 1);
+        }
+        transformed = [];
+        //mvMatrix = mat4.create();
     }
 }
 
 function drawLine(dot1, dot2) {
     context.beginPath();
-    context.moveTo(canvas.width/2 - vertices[dot1][0], canvas.height/2 - vertices[dot1][1]);
-    context.lineTo(canvas.width/2 - vertices[dot2][0], canvas.height/2 - vertices[dot2][1]);
+    context.moveTo(transformed[dot1][0], transformed[dot1][1]);
+    context.lineTo(transformed[dot2][0], transformed[dot2][1]);
     context.stroke();
 }
 
@@ -139,7 +208,7 @@ function translate(dx, dy, dz) {
     translateMatrix[3] = dx;
     translateMatrix[7] = dy;
     translateMatrix[11] = dz;
-    //console.log(translateMatrix);
+    console.log(translateMatrix);
     //mat4.multiply(mvMatrix, mvMatrix, translateMatrix);
     return translateMatrix;
 }
@@ -152,18 +221,25 @@ function scale(sx, sy, sz) {
     //mat4.multiply(mvMatrix, mvMatrix, scaleMatrix);
     return scaleMatrix;
 }
+
+function deg2rad(alpha) {
+    return alpha * Math.PI/180;
+}
+
 //<mat4> rotateX(<float> alpha);
 function rotateX(alpha) {
+    alpha = deg2rad(alpha);
     var rotateXMatrix = mat4.create();
     rotateXMatrix[5] = Math.cos(alpha);
     rotateXMatrix[6] = -Math.sin(alpha);
-    rotateXMatrix[9] = Math.cos(alpha);
-    rotateXMatrix[10] = Math.sin(alpha);
+    rotateXMatrix[9] = Math.sin(alpha);
+    rotateXMatrix[10] = Math.cos(alpha);
     //mat4.multiply(mvMatrix, mvMatrix, rotateXMatrix);
     return rotateXMatrix;
 }
 //<mat4> rotateY(<float> alpha);
 function rotateY(alpha) {
+    alpha = deg2rad(alpha);
     var rotateYMatrix = mat4.create();
     rotateYMatrix[0] = Math.cos(alpha);
     rotateYMatrix[2] = Math.sin(alpha);
@@ -174,11 +250,12 @@ function rotateY(alpha) {
 }
 //<mat4> rotateZ(<float> alpha);
 function rotateZ(alpha) {
+    alpha = deg2rad(alpha);
     var rotateZMatrix = mat4.create();
     rotateZMatrix[0] = Math.cos(alpha);
     rotateZMatrix[1] = -Math.sin(alpha);
-    rotateZMatrix[4] = Math.cos(alpha);
-    rotateZMatrix[5] = Math.sin(alpha);
+    rotateZMatrix[4] = Math.sin(alpha);
+    rotateZMatrix[5] = Math.cos(alpha);
     //mat4.multiply(mvMatrix, mvMatrix, rotateZMatrix);
     return rotateZMatrix;
 }
