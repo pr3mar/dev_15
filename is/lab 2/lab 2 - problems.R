@@ -6,15 +6,21 @@
 #
 # Load the Movies dataset using the command:
 #
-#	md <- read.table("movies.txt", sep=",", header=TRUE)
+md <- read.table("movies.txt", sep=",", header=TRUE)
 #
 # Answer the following questions:
 #
 # - Are there more movies shorter than 100 min or longer than (or equal to) 100 minutes?
 #   (show your answer numerically and graphically) 
-#
+
+tab <- table(md$length >= 100)
+names(tab) <- c("krajsi", "daljsi")
+barplot(tab)
+
 # - Are there more action comedies or romantic comedies?
-#
+action <- length(md$Actio[md$Action == "1"])
+romance <- length(md$Romance[md$Romance == "1"])
+action > romance
 # - Plot a histogram of the ratings for drama movies.
 #
 # - Is the average rating of dramas higher than the average rating of non-dramas?

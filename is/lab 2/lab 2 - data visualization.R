@@ -9,8 +9,8 @@
 # You can achive this using the "setwd" command or by selecting "File -> Change dir..."
 
 # for example:
-# setwd("c:\\labs\\data\\")
-
+setwd("D:\\dev\\dev_15\\is\\lab 2")
+getwd()
 
 # To read data from a text file, use the "read.table" command.
 # The parameter header=TRUE indicates that the file to be read includes a first line with the column names
@@ -20,15 +20,18 @@ md <- read.table(file="movies.txt", sep=",", header=TRUE)
 ?read.table
 
 # Useful functions
-head(md)
-summary(md)
-str(md)
-names(md)
+head(md)      # first couple of lines
+summary(md)   # distribution of data, simple statistics, discrete data -> number of appearances of each entry
+# if false type of data -> 1st thing is to change the data type
+str(md)       # 
+?str
+names(md)     # 
 
 
 # We will transform binary attributes into nominal variables with a fixed number of possible values (factors)
 md$Action <- as.factor(md$Action)
 md$Animation <- as.factor(md$Animation)
+# do the rest 
 
 # The remaining columns will be transformed using the for loop
 for (i in 20:24)
