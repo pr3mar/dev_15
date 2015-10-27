@@ -7,14 +7,14 @@
 
 
 % (b) --> histogram (provided code)
-I = double(rgb2gray(imread('umbrellas.jpg')));
-nbins = 20;
-[H, bins] = myhist(I, nbins);
-figure(2) ; bar(bins, H);
+% I = double(rgb2gray(imread('umbrellas.jpg')));
+% nbins = 20;
+% [H, bins] = myhist(I, nbins);
+% figure(2) ; bar(bins, H);
 % razlicno dolocita prag.
-[H, bins] = hist(I(:), nbins);
-H = H/sum(H);
-figure (3); bar(bins, H);
+% [H, bins] = hist(I(:), nbins);
+% H = H/sum(H);
+% figure (3); bar(bins, H);
 
 % (c) --> embedded histogram function
 % P = I(:); % 2d to 1d vector
@@ -35,5 +35,15 @@ figure (3); bar(bins, H);
 % H = H/sum(H); % normalize
 % subplot(1,3,3); bar(H, 'b');
 
-
+% (d) --> histogram stretching
+I = imread('phone.jpg');
+nbins = 10;
+[H, bins] = myhist(I, nbins);
+figure(4); subplot(1,2,1); axis equal; axis tight; imshow(I);
+figure(5);  subplot(1,2,1); axis equal; axis tight; bar(bins, H);
+stretched = histstretch(I);
+figure(4); subplot(1,2,2); axis equal; axis tight; imshow(stretched);
+nbins = 10;
+[H, bins] = myhist(stretched, nbins);
+figure(5);  subplot(1,2,2); axis equal; axis tight; bar(bins, H);
 
