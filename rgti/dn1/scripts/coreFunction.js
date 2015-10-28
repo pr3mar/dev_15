@@ -16,32 +16,32 @@ function zx(e){
     var charCode = e.which;
     console.log(charCode);
     switch (charCode) {
-        case 87:
-            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateX(6));
-            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
-            break;
-        case 83:
+        case 87: // w
             mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
             mat4.multiply(mvMatrix, mvMatrix, rotateX(-6));
             mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
             break;
-        case 68:
+        case 83: // s
             mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateY(6));
+            mat4.multiply(mvMatrix, mvMatrix, rotateX(6));
             mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
             break;
-        case 65:
+        case 68: // d
             mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
             mat4.multiply(mvMatrix, mvMatrix, rotateY(-6));
             mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
             break;
-        case 69:
+        case 65: // a
+            mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
+            mat4.multiply(mvMatrix, mvMatrix, rotateY(6));
+            mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            break;
+        case 69: // e
             mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
             mat4.multiply(mvMatrix, mvMatrix, rotateZ(6));
             mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
             break;
-        case 81:
+        case 81: // q
             mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
             mat4.multiply(mvMatrix, mvMatrix, rotateZ(-6));
             mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
@@ -140,7 +140,7 @@ function startWorking() {
     triangles = [];
     transformed = [];
     parse(fileContent);
-    pMatrix = perspective(-4);
+    //pMatrix = perspective(-4);
     //mat4.multiply(pMatrix, pMatrix, translate(0, 1, 0));
     //mat4.multiply(pMatrix, pMatrix, scale(0.2, 1, 10));
     var tmp = mat4.create();
@@ -148,11 +148,14 @@ function startWorking() {
     canvas.width  = 800;
     canvas.height = 600;
     context = canvas.getContext("2d");
-    mat4.multiply(mvMatrix, mvMatrix, rotateZ(45));
-    mat4.multiply(mvMatrix, mvMatrix, rotateX(45));
+    //mat4.multiply(mvMatrix, mvMatrix, rotateZ(45));
+    //mat4.multiply(mvMatrix, mvMatrix, rotateX(45));
     //mat4.multiply(mvMatrix, mvMatrix, rotateY(45));
-    mat4.multiply(mvMatrix, mvMatrix, scale(10, 10, 10));
-    mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, -8));
+    mat4.multiply(mvMatrix, mvMatrix, scale(100, 100, 100));
+    mat4.multiply(mvMatrix, mvMatrix, scale(1, -1, 1));
+    mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+    //zrcalenje preko x osi
+    // TODO popravi rotacijo/
     draw();
 }
 
@@ -163,9 +166,12 @@ function draw() {
         //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, -8));
         //console.log(mvMatrix);
         context.clearRect(0, 0, canvas.width, canvas.height);
+        tmp = mat4.create();
+        mat4.multiply(tmp, pMatrix, mvMatrix);
         for(var i = 0; i < vertices.length; i++) {
+            transformed.push(transform(tmp,vertices[i]));
             //console.log(vertices[i]);
-            transformed.push(transform(mvMatrix, vertices[i]));
+            //transformed.push(transform(mvMatrix, vertices[i]));
             //console.log(vertices[i]);
         }
         for(var i = 0; i < triangles.length; i++) {
@@ -188,12 +194,13 @@ function drawLine(dot1, dot2) {
 
 function transform(matrix, vector) {
     var transformation = vec4.create();
+    //vec4.transformMat4(transformation, vector, matrix);
     for(var i = 0; i < vector.length; i++) {
         for(var j = 0; j < vector.length; j++) {
             transformation[i] += matrix[i * vector.length + j] * vector[j];
         }
     }
-    // not sure if correct (?)
+    //not sure if correct (?)
     //if(transformation[transformation.length - 1] != 1) {
     //    for(var i = 0; i < transformation.length; i++) {
     //        transformation[i] /= transformation[transformation.length - 1];
@@ -208,7 +215,7 @@ function translate(dx, dy, dz) {
     translateMatrix[3] = dx;
     translateMatrix[7] = dy;
     translateMatrix[11] = dz;
-    console.log(translateMatrix);
+    //console.log(translateMatrix);
     //mat4.multiply(mvMatrix, mvMatrix, translateMatrix);
     return translateMatrix;
 }
