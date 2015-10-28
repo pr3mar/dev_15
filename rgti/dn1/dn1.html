@@ -44,12 +44,20 @@
     </style>
 </head>
 <body>
-    <input type="file" id="fileChooser" name="files">
-    <!--<pre id="fileDisplayArea">this is pre </pre>-->
+    <!--<pre id="fileDisplayArea">this is pre -->
     <div id="content">
-        <canvas id="drawingCanvas" width="800px" height="600px">
+        <canvas id="drawingCanvas" width="1200" height="600">
             No <code>&lt;canvas&gt;</code> suppport in your browser.
         </canvas>
     </div>
+    <!--<input id="slider" type="range" min="-10" max="10" step="1" value="4" onchange="updatePerspective(this.value);"/>-->
+    <ul>
+        <li><pre>W/S             rotateX</pre></li>
+        <li><pre>A/D             rotateY</pre></li>
+        <li><pre>Q/E             rotateZ</pre></li>
+        <li><pre>+/- (numpad)    scale</pre></li>
+        <li><pre>arrows          translate</pre></li>
+    </ul>
+    <input type="file" id="fileChooser" name="files">
 </body>
 </html>
