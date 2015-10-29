@@ -152,14 +152,14 @@ function startWorking() {
     triangles = [];
     transformed = [];
     parse(fileContent);
-    //mat4.multiply(pMatrix, pMatrix, translate(0, 0, -8));
+    var tmp = mat4.create();
     //mat4.multiply(pMatrix, pMatrix, perspective(4));
     canvas = document.getElementById("drawingCanvas");
     canvas.width  = parseFloat(canvas.getAttribute("width"));
     canvas.height = parseFloat(canvas.getAttribute("height"));
     context = canvas.getContext("2d");
     mat4.multiply(mvMatrix, mvMatrix, scale(100, -100, 100));
-    mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+    mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, -8));
     //zrcalenje preko x osi
     // TODO popravi rotacijo/
     draw();
