@@ -1,5 +1,5 @@
 img = rgb2hsv(imread('hsvWork.jpg'));
-figure(1); clf;
+% figure(1); clf;
 % subplot(1,4,1); imagesc(hsv2rgb(img)); axis equal; axis tight;
 % for i = 1:3
 %     img_copy = img;
