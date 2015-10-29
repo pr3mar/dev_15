@@ -11,16 +11,15 @@ var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 var canvas;
 var context;
-var perspectiveVal;
 
-function updatePerspective(value) {
+//function updatePerspective(value) {
     //perspectiveVal = value;
     //console.log(value);
     //pMatrix = mat4.create();
     //mat4.multiply(pMatrix, pMatrix, translate(0, 0, 0));
     //mat4.multiply(pMatrix, pMatrix, perspective(value));
     //draw();
-}
+//}
 
 function zx(e){
     var charCode = e.which;
@@ -152,9 +151,9 @@ function startWorking() {
     triangles = [];
     transformed = [];
     parse(fileContent);
-    var tmp = mat4.create();
     mat4.multiply(pMatrix, pMatrix, translate(0,0,-8));
     mat4.multiply(pMatrix, pMatrix, perspective(4));
+    console.log(pMatrix);
     canvas = document.getElementById("drawingCanvas");
     canvas.width  = parseFloat(canvas.getAttribute("width"));
     canvas.height = parseFloat(canvas.getAttribute("height"));
@@ -172,7 +171,7 @@ function draw() {
         var tmp = mat4.create();
         mat4.multiply(tmp, pMatrix, mvMatrix);
         vertices.forEach(function (x) {
-            transformed.push(transform(tmp,x));
+            transformed.push(transform(tmp, x));
         });
         //console.log(transformed);
         triangles.forEach(function(current){
