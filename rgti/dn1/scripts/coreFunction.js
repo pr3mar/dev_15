@@ -11,15 +11,42 @@ var mvMatrix = mat4.create();
 var pMatrix = mat4.create();
 var canvas;
 var context;
+var rotateCoord = false;
+var enPerspective = false;
+var perspectiveVal = 4;
+var transformations = [
+    0.0,    // rotate X         0
+    0.0,    // rotate Y         1
+    0.0,    // rotate Z         2
+    100.0,  // scale X          3
+    -100.0, // scale Y          4
+    100.0,  // scale Z          5
+    0.0,    // translate X      6
+    0.0,    // translate Y      7
+    0.0     // translate Z      8
+];
 
-//function updatePerspective(value) {
-    //perspectiveVal = value;
-    //console.log(value);
-    //pMatrix = mat4.create();
-    //mat4.multiply(pMatrix, pMatrix, translate(0, 0, 0));
-    //mat4.multiply(pMatrix, pMatrix, perspective(value));
-    //draw();
-//}
+function updatePerspectiveValue(value) {
+    console.log("perspective val = ", value);
+    perspectiveVal = value;
+    document.getElementById("perspval").innerHTML = "Perspective value: " + value;
+    startWorking();
+}
+
+function updateRotate() {
+    rotateCoord = !rotateCoord;
+    if(rotateCoord) {
+        document.getElementById("comments").innerHTML = "rotate model coordinate system";
+    } else {
+        document.getElementById("comments").innerHTML = "rotate in world's coordinate system (0,0,0)";
+    }
+    startWorking();
+}
+
+function updatePerspective() {
+    enPerspective = !enPerspective;
+    startWorking();
+}
 
 function zx(e){
     var charCode = e.which;
@@ -27,63 +54,87 @@ function zx(e){
     switch (charCode) {
         case 87: // w
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateX(6));
+            mat4.multiply(mvMatrix, rotateX(6), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[0] += 6;
             break;
         case 83: // s
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateX(-6));
+            mat4.multiply(mvMatrix, rotateX(-6), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[0] -= 6;
             break;
         case 68: // d
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateY(-6));
+            mat4.multiply(mvMatrix, rotateY(-6), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[1] -= 6;
             break;
         case 65: // a
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateY(6));
+            mat4.multiply(mvMatrix, rotateY(6), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[1] += 6;
             break;
         case 69: // e
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateZ(6));
+            mat4.multiply(mvMatrix, rotateZ(6), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[2] += 6;
             break;
         case 81: // q
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, rotateZ(-6));
+            mat4.multiply(mvMatrix, rotateZ(-6), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[2] -= 6;
             break;
         case 38: // up arrow
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, translate(0, -6, 0));
+            mat4.multiply(mvMatrix, translate(0, -6, 0), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[7] -= 6;
             break;
         case 40: // down arrow
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, translate(0, 6, 0));
+            mat4.multiply(mvMatrix, translate(0, 6, 0), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[7] += 6;
             break;
         case 39: // right arrow
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, translate(6, 0, 0));
+            mat4.multiply(mvMatrix, translate(6, 0, 0), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[6] += 6;
             break;
         case 37: // left arrow
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, translate(-6, 0, 0));
+            mat4.multiply(mvMatrix, translate(-6, 0, 0), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[6] -= 6;
+            break;
+        case 49: // 1 (over wasd)
+            //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
+            mat4.multiply(mvMatrix, translate(0, 0, 6), mvMatrix);
+            //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[8] += 6;
+            break;
+        case 50: // 2 (over wasd)
+            //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
+            mat4.multiply(mvMatrix, translate(0, 0, -6), mvMatrix);
+            //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[8] -= 6;
             break;
         case 107: // numpad +
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, scale(1.1, 1.1, 1.1));
+            mat4.multiply(mvMatrix, scale(1.1, 1.1, 1.1), mvMatrix);
             //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[3] *= 1.1;transformations[4] *= 1.1;transformations[5] *= 1.1;
             break;
         case 109: // numpad -
             //mat4.multiply(mvMatrix, mvMatrix, translate(0, 0, 0));
-            mat4.multiply(mvMatrix, mvMatrix, scale(1/1.1, 1/1.1, 1/1.1));
-            //mat4.multiply(mvMatrix, mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            mat4.multiply(mvMatrix, scale(1/1.1, 1/1.1, 1/1.1), mvMatrix);
+            //mat4.multiply(mvMatrix    , mvMatrix, translate(canvas.width/2, canvas.height/2, 0));
+            transformations[3] *= 1/1.1;transformations[4] *= 1/1.1;transformations[5] *= 1/1.1;
             break;
         default:
             return;
@@ -94,16 +145,18 @@ function zx(e){
 document.onkeydown =  zx;
 
 window.onload = function() {
+    canvas = document.getElementById("drawingCanvas");
+    canvas.width  = parseFloat(canvas.getAttribute("width"));
+    canvas.height = parseFloat(canvas.getAttribute("height"));
+    context = canvas.getContext("2d");
     document.getElementById("fileChooser").addEventListener("change", handleFiles, false);
 };
 
 function handleFiles(event) {
     var file = event.target.files[0];
-    //console.log(file);
     //if(file.type.match(/text.*/)) {
     var reader = new FileReader();
     reader.onloadend = function() {
-        //document.getElementById("fileDisplayArea").innerHTML = reader.result;
         fileContent = reader.result;
         startWorking();
     };
@@ -147,23 +200,13 @@ function castToGL(array) {
 
 function startWorking() {
     mvMatrix = mat4.create();
+    pMatrix = mat4.create();
     vertices = [];
     triangles = [];
     transformed = [];
-    canvas = document.getElementById("drawingCanvas");
-    canvas.width  = parseFloat(canvas.getAttribute("width"));
-    canvas.height = parseFloat(canvas.getAttribute("height"));
-    context = canvas.getContext("2d");
+    transformations = [0.0, 0.0, 0.0, 100.0, -100.0, 100.0, 0.0, 0.0, 0.0];
     parse(fileContent);
-    var tmp = translate(0,0,-8);
-    //mat4.invert(tmp, tmp);
-    mat4.multiply(pMatrix, pMatrix, tmp);
-    //tmp = perspective(4);
-    //mat4.invert(tmp, tmp);
-    //mat4.multiply(pMatrix, pMatrix, tmp);
-    //zrcalenje preko x osi
-    // TODO popravi rotacijo/
-    mat4.multiply(mvMatrix, mvMatrix, scale(100, -100, 100));
+    mat4.multiply(mvMatrix, scale(100, -100, 100), mvMatrix); // set scaling
     draw();
 }
 
@@ -171,13 +214,31 @@ function draw() {
     if(vertices.length > 0 && triangles.length > 0) {
         context.clearRect(0, 0, canvas.width, canvas.height);
         var tmp = mat4.create();
-        mat4.multiply(tmp, mvMatrix, pMatrix);
-        mat4.multiply(tmp, tmp, translate(canvas.width/2, canvas.height/2, 0));
+        if(rotateCoord) {
+            // ------------------ | rotate on model rotation point
+            mat4.multiply(tmp, rotateX(transformations[0]), tmp);
+            mat4.multiply(tmp, rotateY(transformations[1]), tmp);
+            mat4.multiply(tmp, rotateZ(transformations[2]), tmp);
+            mat4.multiply(tmp, scale(transformations[3], transformations[4], transformations[5]), tmp);
+            mat4.multiply(tmp, translate(transformations[6], transformations[7], transformations[8]), tmp);
+            mat4.multiply(tmp, translate(0, 0, -8), tmp);
+            if(enPerspective) { // prosim mi sporocite kje je napaka
+                console.log("[model] perspective enabled");
+                mat4.multiply(tmp, perspective(perspectiveVal), tmp);
+            }
+            mat4.multiply(tmp, translate(canvas.width / 2, canvas.height / 2, 0), tmp);
+        } else {
+            // ------------------ | rotate in world
+            mat4.multiply(tmp, translate(0, 0, -8), mvMatrix); // set camera
+            if(enPerspective) { // prosim mi sporocite kje je napaka
+                console.log("[world] perspective enabled");
+                mat4.multiply(tmp, perspective(perspectiveVal), tmp); // set perspective
+            }
+            mat4.multiply(tmp, translate(canvas.width / 2, canvas.height / 2, 0), tmp);
+        }
         vertices.forEach(function (x) {
             transformed.push(transform(tmp, x));
         });
-        //mat4.multiply(mvMatrix, mvMatrix, translate(-canvas.width/2, -canvas.height/2, 0));
-        //console.log(transformed);
         triangles.forEach(function(current){
             drawLine(current[0] - 1, current[1] - 1);
             drawLine(current[0] - 1, current[2] - 1);
@@ -197,16 +258,16 @@ function drawLine(dot1, dot2) {
 function transform(matrix, vector) {
     //console.log(vector);
     var transformation = vec4.create(); var tmp = mat4.create();
-    vec4.transformMat4(transformation, vector, mat4.transpose(tmp, matrix));
+    vec4.transformMat4(transformation, vector, matrix);
 
     // normalize? how?
-    if(transformation[transformation.length - 1] != 1) {
+    if(transformation[3] != 1) {
         transformation[0] /= transformation[3];
         transformation[1] /= transformation[3];
         transformation[2] /= transformation[3];
         transformation[3] /= transformation[3];
     }
-    console.log(transformation);
+    //console.log(transformation);
     return transformation;
 }
 
@@ -217,7 +278,7 @@ function translate(dx, dy, dz) {
     translateMatrix[7] = dy;
     translateMatrix[11] = dz;
     //console.log(translateMatrix);
-    //mat4.multiply(mvMatrix, mvMatrix, translateMatrix);
+    mat4.transpose(translateMatrix, translateMatrix);
     return translateMatrix;
 }
 //<mat4> scale(<float> sx, <float> sy, <float> sz);
@@ -226,7 +287,6 @@ function scale(sx, sy, sz) {
     scaleMatrix[0] = sx;
     scaleMatrix[5] = sy;
     scaleMatrix[10] = sz;
-    //mat4.multiply(mvMatrix, mvMatrix, scaleMatrix);
     return scaleMatrix;
 }
 
@@ -242,7 +302,7 @@ function rotateX(alpha) {
     rotateXMatrix[6] = -Math.sin(alpha);
     rotateXMatrix[9] = Math.sin(alpha);
     rotateXMatrix[10] = Math.cos(alpha);
-    //mat4.multiply(mvMatrix, mvMatrix, rotateXMatrix);
+    mat4.transpose(rotateXMatrix, rotateXMatrix);
     return rotateXMatrix;
 }
 //<mat4> rotateY(<float> alpha);
@@ -253,7 +313,7 @@ function rotateY(alpha) {
     rotateYMatrix[2] = Math.sin(alpha);
     rotateYMatrix[8] = -Math.sin(alpha);
     rotateYMatrix[10] = Math.cos(alpha);
-    //mat4.multiply(mvMatrix, mvMatrix, rotateYMatrix);
+    mat4.transpose(rotateYMatrix, rotateYMatrix);
     return rotateYMatrix;
 }
 //<mat4> rotateZ(<float> alpha);
@@ -264,15 +324,14 @@ function rotateZ(alpha) {
     rotateZMatrix[1] = -Math.sin(alpha);
     rotateZMatrix[4] = Math.sin(alpha);
     rotateZMatrix[5] = Math.cos(alpha);
-    //mat4.multiply(mvMatrix, mvMatrix, rotateZMatrix);
+    mat4.transpose(rotateZMatrix, rotateZMatrix);
     return rotateZMatrix;
 }
 //<mat4> perspective(<float> d); // primerna vrednost je d=4
 function perspective(d){
-    perspectiveVal = d;
     var perspectiveMatrix = mat4.create();
-    perspectiveMatrix[10] = 0;
+    perspectiveMatrix[15] = 0;
     perspectiveMatrix[14] = 1 / d;
-    //mat4.multiply(mvMatrix, mvMatrix, perspectiveMatrix);
+    mat4.transpose(perspectiveMatrix, perspectiveMatrix);
     return perspectiveMatrix;
 }

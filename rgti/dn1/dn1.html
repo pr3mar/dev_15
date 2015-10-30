@@ -28,8 +28,8 @@
 
         ul {
             text-align: left;
+            float: left;
         }
-
         td {
             width: 200px;
         }
@@ -46,18 +46,26 @@
 <body>
     <!--<pre id="fileDisplayArea">this is pre -->
     <div id="content">
+        <div id="wrapper">
+            <div id="comments">rotate in world's coordinate system (0,0,0)</div>
+            <button id="rotButton" type="button" onclick="updateRotate()" title="may result in jump because of different track of movements.">Change rotation </button>
+            <label><input id="perpCheck" type="checkbox" onclick="updatePerspective()" title="may result in jump because of different track of movements."/> Enable perspective</label>
+            <label><input id="slider" type="range" min="-10" max="20" step="1" value="4" onchange="updatePerspectiveValue(this.value);"/><span id="perspval">Perspective value: 4</span></label>
+        </div>
         <canvas id="drawingCanvas" width="1200" height="600">
             No <code>&lt;canvas&gt;</code> suppport in your browser.
         </canvas>
+        <div>
+            <ul>
+            <li><pre>W/S             rotateX</pre></li>
+            <li><pre>A/D             rotateY</pre></li>
+            <li><pre>Q/E             rotateZ</pre></li>
+            <li><pre>+/- (numpad)    scale</pre></li>
+            <li><pre>arrows          translate</pre></li>
+        </ul>
+            <input type="file" id="fileChooser" name="files">
+        </div>
+
     </div>
-    <!--<input id="slider" type="range" min="-10" max="10" step="1" value="4" onchange="updatePerspective(this.value);"/>-->
-    <ul>
-        <li><pre>W/S             rotateX</pre></li>
-        <li><pre>A/D             rotateY</pre></li>
-        <li><pre>Q/E             rotateZ</pre></li>
-        <li><pre>+/- (numpad)    scale</pre></li>
-        <li><pre>arrows          translate</pre></li>
-    </ul>
-    <input type="file" id="fileChooser" name="files">
 </body>
 </html>
