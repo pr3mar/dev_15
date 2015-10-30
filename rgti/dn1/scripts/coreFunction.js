@@ -27,7 +27,7 @@ var transformations = [
 ];
 
 function updatePerspectiveValue(value) {
-    console.log("perspective val = ", value);
+    //console.log("perspective val = ", value);
     perspectiveVal = value;
     document.getElementById("perspval").innerHTML = "Perspective value: " + value;
     startWorking();
@@ -154,7 +154,7 @@ window.onload = function() {
 
 function handleFiles(event) {
     var file = event.target.files[0];
-    //if(file.type.match(/text.*/)) {
+    //if(file.type.match(/text.*/)) { // only .txt files
     var reader = new FileReader();
     reader.onloadend = function() {
         fileContent = reader.result;
@@ -183,7 +183,7 @@ function parseElements(line) {
             triangles.push(castToGL(line));
             break;
         default :
-            //console.log("error");
+            //console.log("unknown element");
     }
 }
 
@@ -223,7 +223,7 @@ function draw() {
             mat4.multiply(tmp, translate(transformations[6], transformations[7], transformations[8]), tmp);
             mat4.multiply(tmp, translate(0, 0, -8), tmp);
             if(enPerspective) { // prosim mi sporocite kje je napaka
-                console.log("[model] perspective enabled");
+                //console.log("[model] perspective enabled");
                 mat4.multiply(tmp, perspective(perspectiveVal), tmp);
             }
             mat4.multiply(tmp, translate(canvas.width / 2, canvas.height / 2, 0), tmp);
@@ -231,7 +231,7 @@ function draw() {
             // ------------------ | rotate in world
             mat4.multiply(tmp, translate(0, 0, -8), mvMatrix); // set camera
             if(enPerspective) { // prosim mi sporocite kje je napaka
-                console.log("[world] perspective enabled");
+                //console.log("[world] perspective enabled");
                 mat4.multiply(tmp, perspective(perspectiveVal), tmp); // set perspective
             }
             mat4.multiply(tmp, translate(canvas.width / 2, canvas.height / 2, 0), tmp);
@@ -257,9 +257,8 @@ function drawLine(dot1, dot2) {
 
 function transform(matrix, vector) {
     //console.log(vector);
-    var transformation = vec4.create(); var tmp = mat4.create();
+    var transformation = vec4.create();
     vec4.transformMat4(transformation, vector, matrix);
-
     // normalize? how?
     if(transformation[3] != 1) {
         transformation[0] /= transformation[3];
