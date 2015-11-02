@@ -26,11 +26,19 @@
 results = zeros(30 * 4, 2);
 [histograms, files] = load_histogram_database('images', 8);
 for i = 1:size(histograms,1)
-    results(i, 1) = compare_histograms(histograms(20,:), histograms(i,:), 'intersect'); 
+    results(i, 1) = compare_histograms(histograms(20,:), histograms(i,:), 'l2'); 
     results(i, 2) = double(i);
 end
-results = sortrows(results, 1);
-for i = 1:6
-    subplot(2,6,i); imshow(imread(char(files(results(i,2)))));axis tight; axis equal; %title(char(files(results(i,2))));
-    subplot(2,6,i + 6);bar(histograms(results(i,2), :) ); axis tight; axis equal;title(sprintf('%.4f', results(i,1)))
-end
+figure(3); clf;
+plot(results(:,1)); hold on
+[results, idx] = sortrows(results, 1);
+results(idx(1:5),:)
+plot(results(idx(1:5)), 'o'); hold off
+figure(4); clf
+plot(results(:,1));  hold on
+plot(results(1:5), 'o'); hold off
+% figure(4); clf;
+% for i = 1:6
+%     subplot(2,6,i); imshow(imread(char(files(results(i,2)))));axis tight; axis equal; %title(char(files(results(i,2))));
+%     subplot(2,6,i + 6);bar(histograms(results(i,2),:)); title(sprintf('%.4f', results(i,1)))
+% end
