@@ -177,24 +177,27 @@ function parseElements(line) {
     var identifier = line.shift();
     switch(identifier) {
         case "v":
-            vertices.push(castToGL(line));
+            vertices.push(castToGL(line, true));
             break;
         case "f":
-            triangles.push(castToGL(line));
+            triangles.push(castToGL(line, false));
             break;
         default :
             //console.log("unknown element");
     }
 }
 
-function castToGL(array) {
+function castToGL(array, vertex) {
     var tmpVector = vec4.create(), i = 0;
     array.forEach(function (x) {
         tmpVector[i] = parseFloat(x);
         i++;
     });
     tmpVector[3] = 1;
-    //vec4.normalize(tmpVector, tmpVector);
+    if(vertex) {
+        vec4.normalize(tmpVector, tmpVector);
+        console.log(tmpVector);
+    }
     return tmpVector;
 }
 

@@ -1,0 +1,4 @@
+function [ H ] = myhist3( img, bins )
+    idx = floor(double(img) * bins / (255 * 1e-5)));
+end
+
