@@ -31,6 +31,7 @@ for i = 1:size(histograms,1)
 end
 results = sortrows(results, 1);
 for i = 1:6
-    subplot(2,6,i); imshow(imread(char(files(results(i,2)))));axis tight; axis equal; %title(char(files(results(i,2))));
-    subplot(2,6,i + 6);bar(histograms(results(i,2), :) ); axis tight; axis equal;title(sprintf('%.4f', results(i,1)))
+    subplot(2,6,i); imshow(imread(char(files(results(i,2)))));axis tight; axis equal; 
+    subplot(2,6,i + 6);bar(histograms(results(i,2), :) ); axis tight; axis equal;title(sprintf('%02results(i,1))
+    size(histograms( results(i,2), :))
 end
