@@ -1,27 +1,27 @@
-% % (b)
-% signal = load('signal.txt');
-% kernel = load('kernel.txt');
-% 
-% figure(1); clf;
-% plot(signal); hold on;
-% plot(kernel);
-% convolution = simple_convolution(signal, kernel);
-% plot(convolution);
-% embedded = conv(signal, kernel, 'same');
-% plot(embedded);  hold off;
+% (b, c)
+signal = load('signal.txt');
+kernel = load('kernel.txt');
 
-% % (d) 
-% figure(2); clf;
-% [gaus_kernel, x] = gauss(0.5);
-% plot(x, gaus_kernel); hold on;
-% [gaus_kernel, x] = gauss(1);
-% plot(x, gaus_kernel); 
-% [gaus_kernel, x] = gauss(2);
-% plot(x, gaus_kernel); 
-% [gaus_kernel, x] = gauss(3);
-% plot(x, gaus_kernel); 
-% [gaus_kernel, x] = gauss(4);
-% plot(x, gaus_kernel); hold off;
+figure(1); clf;
+plot(signal); hold on;
+plot(kernel);
+convolution = simple_convolution(signal, kernel);
+plot(convolution);
+embedded = conv(signal, kernel, 'same');
+plot(embedded);  hold off;
+
+% (d) 
+figure(2); clf;
+[gaus_kernel, x] = gauss(0.5);
+plot(x, gaus_kernel); hold on;
+[gaus_kernel, x] = gauss(1);
+plot(x, gaus_kernel); 
+[gaus_kernel, x] = gauss(2);
+plot(x, gaus_kernel); 
+[gaus_kernel, x] = gauss(3);
+plot(x, gaus_kernel); 
+[gaus_kernel, x] = gauss(4);
+plot(x, gaus_kernel); hold off;
 
 % (e)
 signal = load('signal.txt');
