@@ -3,17 +3,23 @@
 # PROBLEMS:
 #
 # 1.  Construct a vector that contains elements: 1,2,3,...,19,20.
-#
-#
+      
+      x <- c(1:19)
+
 # 2.  Construct a vector that contains elements: 1,2,3,...,19,20,19,...,3,2,1.
-#
+
+      x <- c(c(1:19), c(20:1))
 #
 # 3.  Construct a vector that contains elements: 1,3,5,1,3,5,...,1,3,5 
 #     where there are 10 occurrences of element 5.
-#
+      
+      vec3 <- rep(c(1,3,5), times = 10)
+      vec3
 #
 # 4.  Calculate the values of sin(x) at 0, 0.1, 0.2, 0.3, ..., 1.0
-#
+      
+      sins <- sin((c(0:10))/10)
+      sins
 #
 # 5.  Suppose we have measured the heights and weights of ten individuals:
 #
@@ -27,7 +33,9 @@
 #     bmi = weight_in_kg / (height_in_m)^2
 #
 #     HINT: first convert heights from 'cm' to 'm', then use the formula above.  
-#
+      
+      bmi <- weight/(height/100)^2
+      bmi
 #
 # 6.  Consider a vector:
 # 
@@ -35,8 +43,9 @@
    
 #     Edit the vector x as follows. Replace all elements with a negative value 
 #     with 0. Multiply the elements with a positive value by 10.
-#
-#
+
+      x[x < 0] = 0
+
 # 7.  Without using R, determine the result of the following computation:
 #
       x <- c(1,2,3)
@@ -52,7 +61,7 @@
 #
 #     HINT: the integer division operator is %/%
 #           the modulus operator is %%              
-#
+      length(x[x %% 11 == 0])
 #
 # 9.  Consider a data frame:
 #
@@ -68,27 +77,36 @@
 #     
 #     - calculate the average age of persons in our dataset. 
 #       (HINT: use the mean() function)
-#
+      
+      mean(df$age)
+
 #
 #     - calculate the average age of students in our dataset.
-#
-#
+      
+      mean(df$age[df$student])
+      
 #     - how many males and females are in our dataset? 
 #       (HINT: use the table() function)
-#
-#
+      
+      male <- length(df$gender[df$gender == 'm'])
+      female <- length(df$gender) - male
+      table(df$gender)
 #     - print persons that are students. 
-#
-#
+      
+      df[df$student,]
+      
 #     - print persons who are between 1.8m and 1.9m tall (inclusive). 
-#
-#
+      
+      df[df$height >= 180 & df$height <= 190,]
+      
 #     - print students who are above average height 
 #       (considering all persons in the dataset).
-#
-#
+
+      df[df$student & df$height > mean(df$height),]
 #     - arrange persons by their age. 
 #       (HINT: use the order function)             
-#
+      
+      df[order(df$age),]
+      
 ###############################################################################
 

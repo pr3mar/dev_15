@@ -333,7 +333,7 @@ function rotateZ(alpha) {
 function perspective(d){
     var perspectiveMatrix = mat4.create();
     perspectiveMatrix[15] = 0;
-    perspectiveMatrix[14] = 1 / d;
+    perspectiveMatrix[14] = -1 / d;
     mat4.transpose(perspectiveMatrix, perspectiveMatrix);
     return perspectiveMatrix;
 }
