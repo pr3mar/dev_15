@@ -7,7 +7,7 @@
 
 # You install a package in R with the function install.packages():
 #
-#     install.packages(c("ipred", "prodlim", "CORElearn"))
+     install.packages(c("ipred", "prodlim", "CORElearn"))
 #
 # To install packages without root access:
 #
@@ -16,7 +16,7 @@
 #
 
 
-ins <- read.table("insurance.txt", header = T, sep = ",")
+ins <- read.table("data/insurance.txt", header = T, sep = ",")
 
 
 #
@@ -74,3 +74,4 @@ res <- errorest(insurance~., data=ins, model = mymodel.coremodel, predict = mypr
 # leave-one-out strategy
 res <- errorest(insurance~., data=ins, model = mymodel.coremodel, predict = mypredict.coremodel, target.model = "tree", est.para=control.errorest(k = nrow(ins)))
 1-res$error
+

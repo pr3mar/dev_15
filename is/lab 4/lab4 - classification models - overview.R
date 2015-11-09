@@ -9,7 +9,7 @@
 
 # You install a package in R with the function install.packages():
 #
-#     install.packages(c("ipred", "prodlim", "CORElearn", "e1071", "randomForest", "kernlab", "nnet"))
+     install.packages(c("ipred", "prodlim", "CORElearn", "e1071", "randomForest", "kernlab", "nnet"))
 #
 # To install packages without root access:
 #
@@ -20,8 +20,8 @@
 
 
 
-learn <- read.table("spamlearn.txt", header = T)
-test <- read.table("spamtest.txt", header = T)
+learn <- read.table("data/spamlearn.txt", header = T)
+test <- read.table("data/spamtest.txt", header = T)
 
 # the target variable is the "Class" attribute
 observed <- test$Class
@@ -45,7 +45,7 @@ brier.score <- function(observedMatrix, predictedMatrix)
 library(ipred)
 
 mypredict.generic <- function(object, newdata){predict(object, newdata, type = "class")}
-mymodel.coremodel <- function(formula, data, target.model){CoreModel(formula, data, model=target.model)}
+mymodel.coremodel <- function(formula, data, target.model){CoreModel(formula, data, model=target.model)} # core learn, learning
 mypredict.coremodel <- function(object, newdata) {pred <- predict(object, newdata)$class; destroyModels(object); pred}
 
 
