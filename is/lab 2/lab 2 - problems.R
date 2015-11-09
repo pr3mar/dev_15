@@ -21,9 +21,9 @@
 
 # - Are there more action comedies or romantic comedies?
 
-    action <- length(md$Actio[md$Action == "1"])
-    romance <- length(md$Romance[md$Romance == "1"])
-    action > romance
+    action <- md$Action == "1" & md$Comedy == "1"
+    romance <- md$Romance == "1" & md$Comedy == "1"
+    table(action, romance);
 
 # - Plot a histogram of the ratings for drama movies.
     
@@ -32,11 +32,15 @@
 # - Is the average rating of dramas higher than the average rating of non-dramas?
 #   (show your answer numerically and graphically)
     
-    mean(md$Drama)
+    mean(md$rating[md$Drama == '1'])
+    mean(md$rating[md$Drama != '1'])
     
+    boxplot(rating ~ Drama, data = md)    
     
 # - Plot the number of animated movies being produced every year for the period 1995-2005.
-#
+    
+    
+    
 # - Is there a clear boundary between short and feature movies (according to their length)?
 #
 #
