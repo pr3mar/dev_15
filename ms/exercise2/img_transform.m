@@ -20,7 +20,7 @@ x_view = [1, w, w, 1]';
 y_view = [1, 1, h, h]';
 
 %estimate homography
-% H = estimate_homography(x_view, y_view, x_camera, y_camera);
+H = estimate_homography(x_view, y_view, x_camera, y_camera);
 % points = [x_view, y_view, ones(4,1)];
 % % display the preliminary dots
 % figure(1);
@@ -29,7 +29,7 @@ y_view = [1, 1, h, h]';
 % plot(x_view, y_view, 'rx');
 % axis tight; axis equal;
 % hold off;
-%
+% 
 % % apply homography
 % points = H * points';
 % % normalize the dots
@@ -43,20 +43,20 @@ y_view = [1, 1, h, h]';
 % plot(x_camera, y_camera, 'yo');
 % plot(points(1,:), points(2,:), 'rx');
 % axis tight; axis equal;
-% 
-% % insert the truck picture into the monitor picture
-% % meshgrid!!!
-% for i = 1:size(truck, 1)
-%     for j = 1:size(truck, 2)
-%         tmp_xy = H * [j, i, 1]';
-%         tt = round(tmp_xy / tmp_xy(end));
-%         transform_truck(tt(2), tt(1), :) = truck(i,j,:);
-%     end
-% end
-% % show the image
-% figure(2); clf;
-% imshow(transform_truck); axis tight; axis equal; hold on;
-% plot(x_camera, y_camera, 'yo');
+
+% insert the truck picture into the monitor picture
+% meshgrid!!!
+for i = 1:size(truck, 1)
+    for j = 1:size(truck, 2)
+        tmp_xy = [j, i, 1] * H';
+        tt = round(tmp_xy / tmp_xy(end));
+        transform_truck(tt(2), tt(1), :) = truck(i,j,:);
+    end
+end
+% show the image
+figure(2); clf;
+imshow(transform_truck); axis tight; axis equal; hold on;
+plot(x_camera, y_camera, 'yo');
 
 % load the video
 video = read_video('bigbuck');
@@ -70,10 +70,11 @@ for frame = 1:size(video,4)
     transform_video = monitor(:,:,:);
     for i = 1:size(video, 1)
         for j = 1:size(video, 2)
-            tmp_xy = H * [j, i, 1]';
+            tmp_xy = [j, i, 1] * H';
             tt = round(tmp_xy / tmp_xy(end));
             transform_video(tt(2), tt(1), :) = video(i,j,:, frame);
         end
     end
+    %figure; imshow(transform_video);
     imwrite(transform_video, fullfile('bigbuck_monitor', sprintf('%08d.jpg', frame)));
 end
