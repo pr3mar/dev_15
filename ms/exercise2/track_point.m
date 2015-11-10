@@ -20,13 +20,14 @@ function [ trackX, trackY ] = track_point( frames, startX, startY, patchSize, se
         y2 = min(height, centerY + halfSize(searchSize) - 1);
         currentPatch = currentPatch(y1:y2, x1:x2);
         currSize = size(currentPatch)
-        tt = normxcorr2(template, currentPatch);
+        tt = normxcorr2(template, currentPatch); % dokumentacija
 %         tt_size = size(tt);
         [x] = max(max(tt));
         [indY, indX] = find(tt == max(tt(:)), 1)
         % how to do this????
-        trackX(i) = indX + x1 - size(template,1);
-        trackY(i) = indY + y1 - size(template,2);
+        trackX(i) = indX + x1 - size(template,1)/2;
+        trackY(i) = indY + y1 - size(template,2)/2;
+        % iste slike zaporedoma
     end
 end
 

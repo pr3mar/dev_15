@@ -36,6 +36,7 @@ plot(points(1,:), points(2,:), 'rx');
 axis tight; axis equal;
 figure(2); clf;
 round(points)
+%meshgrid!!!
 for i = 1:size(video,1)
     for j = 1:size(video,2)
         tmp_xy = H * [j, i, 1]';
