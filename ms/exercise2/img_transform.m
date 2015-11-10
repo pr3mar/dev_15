@@ -4,7 +4,7 @@ truck = imread('truck.jpg');
 transform_truck = imread('monitor.jpg');
 
 % get the height/width
-[h, w, ~] = size(truck);
+[w, h, ~] = size(truck);
 
 % get the input from the user (counter clockwise)
 imshow(monitor);
@@ -48,7 +48,7 @@ H = estimate_homography(x_view, y_view, x_camera, y_camera);
 % meshgrid!!!
 for i = 1:size(truck, 1)
     for j = 1:size(truck, 2)
-        tmp_xy = [j, i, 1] * H';
+        tmp_xy = H * [i, j, 1]';
         tt = round(tmp_xy / tmp_xy(end));
         transform_truck(tt(2), tt(1), :) = truck(i,j,:);
     end
@@ -61,7 +61,7 @@ plot(x_camera, y_camera, 'yo');
 % load the video
 video = read_video('bigbuck');
 transform_video = zeros(size(monitor));
-[h, w, ~] = size(video);
+[w, h, ~] = size(video);
 x_view = [1, w, w, 1]';
 y_view = [1, 1, h, h]';
 H = estimate_homography(x_view, y_view, x_camera, y_camera);
@@ -70,11 +70,12 @@ for frame = 1:size(video,4)
     transform_video = monitor(:,:,:);
     for i = 1:size(video, 1)
         for j = 1:size(video, 2)
-            tmp_xy = [j, i, 1] * H';
+            tmp_xy = H * [i, j, 1]';
             tt = round(tmp_xy / tmp_xy(end));
             transform_video(tt(2), tt(1), :) = video(i,j,:, frame);
         end
     end
-    %figure; imshow(transform_video);
+%     figure; imshow(transform_video);
     imwrite(transform_video, fullfile('bigbuck_monitor', sprintf('%08d.jpg', frame)));
+%     break;
 end
