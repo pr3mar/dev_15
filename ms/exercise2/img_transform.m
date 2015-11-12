@@ -65,8 +65,10 @@ transform_video = zeros(size(monitor));
 x_view = [1, w, w, 1]';
 y_view = [1, 1, h, h]';
 H = estimate_homography(x_view, y_view, x_camera, y_camera);
+vf = figure(2);
 % transform the video
 for frame = 1:size(video,4)
+    set(0, 'CurrentFigure', vf);
     transform_video = monitor(:,:,:);
     for i = 1:size(video, 1)
         for j = 1:size(video, 2)
@@ -75,7 +77,8 @@ for frame = 1:size(video,4)
             transform_video(tt(2), tt(1), :) = video(i,j,:, frame);
         end
     end
-%     figure; imshow(transform_video);
-    imwrite(transform_video, fullfile('bigbuck_monitor', sprintf('%08d.jpg', frame)));
+    imshow(transform_video);
+    pause(0.0001);
+%     imwrite(transform_video, fullfile('bigbuck_monitor', sprintf('%08d.jpg', frame)));
 %     break;
 end
