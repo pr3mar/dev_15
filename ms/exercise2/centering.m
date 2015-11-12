@@ -6,31 +6,32 @@ new_video = uint8(zeros(100,100,3,size(video,4)));
 vf = figure(1);
 
 % set filter
-f = fspecial('average' , 125);
+f = fspecial('average' , 150);
 
 % frame max diff
-x_frames = zeros(1,size(video,4));
-y_frames = zeros(1,size(video,4));
+x_frames = zeros(size(video,4),1);
+y_frames = zeros(size(video,4),1);
 
 % difference between frames
-for i = 1:size(video,4) - 1
-    set(0, 'CurrentFigure', vf);
-    
+for i = 1:size(video,4) - 1    
     % get 2 consecutive frames and convert them to hsv color space
     tmp1 = rgb2hsv(video(:,:,:,i));
     tmp2 = rgb2hsv(video(:,:,:,i + 1));
     
     % get the difference and filter it
     dif = abs(tmp1(:,:,1) - tmp2(:,:,1));
-    dif = imfilter(double(dif), f, 'same');
+    dif = imfilter(double(dif), f, 'corr');
     
     % find the maximum difference
     [mm, max_frame] = max(dif(:));
     [x_frames(i), y_frames(i)] = ind2sub(size(dif), max_frame);
-    
-    % view the difference
-    subplot(1,2,1);imagesc(video(:,:,:,i)); axis tight; axis equal;
-    
+end
+
+x_frames = smooth(x_frames);
+y_frames = smooth(y_frames);
+
+for i = 1:size(x_frames)
+    set(0, 'CurrentFigure', vf);
     left = x_frames(i); % + 49
     right = x_frames(i) + 99; % + 50
     
@@ -65,10 +66,8 @@ for i = 1:size(video,4) - 1
     new_video(:,:,:,i) = video(top:bottom, left:right, :, i);
     
     % display result
-    subplot(1,2,2);
-    imagesc(new_video(:,:,:,i));
-    axis tight; axis equal;
+    subplot(1,2,1); imagesc(video(:,:,:,i));        axis tight; axis equal;
+    subplot(1,2,2); imagesc(new_video(:,:,:,i));    axis tight; axis equal;
     
-    % pause
     pause(0.001);
 end
