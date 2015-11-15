@@ -14,24 +14,24 @@ y_frames = zeros(size(video,4),1);
 
 % difference between frames
 for i = 1:size(video,4) - 1 
-%     set(0, 'CurrentFigure', vf);
+    set(0, 'CurrentFigure', vf);
     % get 2 consecutive frames and convert them to hsv color space
     tmp1 = rgb2hsv(video(:,:,:,i));
     tmp2 = rgb2hsv(video(:,:,:,i + 1));
     
     % get the difference and filter it
     dif = abs(tmp1(:,:,1) - tmp2(:,:,1));
-%     subplot(1,2,1); imagesc(dif); axis equal; axis tight;
+    subplot(1,2,1); imagesc(dif); axis equal; axis tight;
     dif = imfilter(double(dif), f, 'corr');
-%     subplot(1,2,2); imagesc(dif); axis equal; axis tight;
+    subplot(1,2,2); imagesc(dif); axis equal; axis tight;
     % find the maximum difference
     [mm, max_frame] = max(dif(:));
     [x_frames(i), y_frames(i)] = ind2sub(size(dif), max_frame);
-%     pause(0.001);
+    pause(0.001);
 end
 
-% x_frames = smooth(x_frames);
-% y_frames = smooth(y_frames);
+x_frames = smooth(x_frames);
+y_frames = smooth(y_frames);
 vf = figure(2);
 for i = 1:size(x_frames)
     set(0, 'CurrentFigure', vf);

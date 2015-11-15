@@ -7,7 +7,7 @@
 
 # You install a package in R with the function install.packages():
 #
-     install.packages(c("ipred", "prodlim", "CORElearn"))
+#     install.packages(c("ipred", "prodlim", "CORElearn"))
 #
 # To install packages without root access:
 #
