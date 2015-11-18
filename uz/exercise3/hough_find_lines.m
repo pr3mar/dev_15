@@ -2,7 +2,7 @@ function [ rho, theta ] = hough_find_lines...
     ( Ie, bins_rho, bins_theta, threshold )
     [h, w] = size(Ie);
     hough = zeros(bins_rho, bins_theta);
-    theta = 0:pi/bins_theta:pi; theta = theta(1:end-1);
+    theta = 0:(pi/bins_theta):pi; theta = theta(1:end-1);
     theta = theta - pi/2;
     D = length(diag(Ie));
     rho = -D:(2*D/bins_rho):D; rho = rho(1:end-1); % 2 * D??
@@ -14,11 +14,17 @@ function [ rho, theta ] = hough_find_lines...
 %     ac = size(acc), co = size(cosine), si = size(sine), max(edge_x), max(edge_y)
 %     acc(1:size(edge_x),:) = cosine(edge_x,:) + sine(edge_y,:);
     
-    for i = 1:numel(theta)
-        rho_iter = edge_x * cos(theta(i)) + edge_y * sin(theta(i));
+    for i = 1:numel(edge_x)
+        rho_iter = edge_x(i) * cos(theta) + edge_y(i) * sin(theta);
 %         hough(:,i) = hist(acc(:,i), rho);
-        id = round((abs(rho_iter + D)/numel(rho)) * bins_rho);
-        hough(id,i) = hough(id, i) + 1;
+        id = floor(((rho_iter + D)/(2*D)) * bins_rho) + 1;
+        id_theta = find(id < bins_rho);
+        id = id(id < bins_rho);
+%         id_theta = theta(id < bins_rho);
+        for k = 1:numel(id)
+            hough(id(k), id_theta(k)) = hough(id(k), id_theta(k)) + 1;
+        end
+%         hough(id,i) = hough(id, i) + 1;
 %         for j = 1:numel(edge_x)
 %             [~,id] = min(abs(rho - rho_iter(j)));
 %             hough(id,i) = hough(id,i) + 1;

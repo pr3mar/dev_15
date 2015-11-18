@@ -4,7 +4,7 @@ E(20,20) = 1;
 
 % figure; imagesc(imread('oneline.png'));
 
-oneline = rgb2gray(imread('oneline.png'));
+oneline = rgb2gray(imread('rectangle.png'));
 oneline_edges = findEdges(oneline, 1, 1); %colormap gray;
 % figure(1); imagesc(oneline); colormap gray
 % figure(2); imagesc(oneline_edges); colormap gray
