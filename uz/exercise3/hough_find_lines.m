@@ -26,7 +26,9 @@ function [ rho, theta ] = hough_find_lines...
 %             hough(id(k), id_theta(k)) = hough(id(k), id_theta(k)) + 1;
 %         end
     end
-    % id = rho_iter 
-    figure(1); imagesc(hough); title('acc'); colormap jet
-%      plot(rho_iter)
+    figure(1); subplot(1,2,1); imagesc(hough); title('acc'); colormap jet
+    hough = nonmaxima_suppression_box(hough);
+    subplot(1,2,2); imagesc(hough); title('acc'); colormap jet
+    thresholded = hough > threshold;
+    [rho, theta] = find(thresholded);
 end

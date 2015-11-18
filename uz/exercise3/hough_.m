@@ -1,4 +1,4 @@
-function [out_rho, out_theta] = hough_(Ie,bins_rho, bins_theta)
+function [out_rho, out_theta] = hough_(Ie,bins_rho, bins_theta, threshold)
     acc = zeros(bins_rho, bins_theta);
     theta_vals = 0:(pi/bins_theta):pi; theta_vals = theta_vals(1:end-1);
 %     rho = -D:(2*D/bins_rho):D; rho = rho(2:end);
@@ -26,5 +26,8 @@ function [out_rho, out_theta] = hough_(Ie,bins_rho, bins_theta)
     acc = nonmaxima_suppression_box(acc);
     subplot(1,2,2); imagesc(acc); axis tight; axis equal; colormap jet
 %     imagesc(acc); colormap jet
-    out_rho = 0, out_theta = 0;
+    thresholded = acc > threshold;
+    [out_rho, out_theta] = find(thresholded);
+    out_rho = (out_rho / bins_rho - 0.5) * 2 * D;
+    out_theta = (out_theta/ bins_theta - 0.5) * pi;
 end
