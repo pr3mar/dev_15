@@ -12,7 +12,7 @@ function [ out_rho, out_theta ] = hough_find_lines_1...
     numel(rho_val)
     numel(theta_val)
     
-    [pointX, pointY] = find(Ie > 0);
+    [pointY, pointX] = find(Ie > 0);
 %     size(pointX), size(theta_val)
     acc = zeros(numel(pointX), numel(theta_val));
 %     figure; 
@@ -21,11 +21,11 @@ function [ out_rho, out_theta ] = hough_find_lines_1...
 %     plot(pointX(2) * cos(theta_val) + pointY(2) * sin(theta_val))
     cosine = (0:w-1)' * cos(theta_val);
     sine = (0:h-1)' * sin(theta_val);
-    acc(1:size(pointX),:) = cosine(pointY,:) + sine(pointX,:);
+    acc(1:size(pointX),:) = cosine(pointX,:) + sine(pointY,:);
     for i = 1:numel(theta_val)
 %         h_size = size(hough(i,:))
 %         hist_size = size(hist(acc(:,i), rho_val))
-        hough(:,end - i + 1) = hist(acc(:,i), rho_val);
+        hough(:,i) = hist(acc(:,i), rho_val);
     end
     
     
