@@ -15,15 +15,15 @@
 % draw_hough_lines(rectangle, rho, theta);
 
 % pier = rgb2gray(imread('pier.jpg'));
-% pier_edges = findEdges(pier, 2, 10);
-% figure(2); subplot(1,2,1); imagesc(pier); colormap default;
-% subplot(1,2,2); imagesc(pier_edges); colormap gray;
-% [rho, theta] = hough_(pier_edges, 600, 500, 400);
+% pier_edges = findEdges(pier, 3, 10);
+% figure(2);%subplot(1,2,1); imagesc(pier); colormap default;
+% subplot(1,2,1); imagesc(pier_edges); colormap gray;
+% [rho, theta] = hough_(pier_edges, 600, 500, 320);
 % figure(2); subplot(1,2,2); draw_hough_lines(pier, rho, theta);
 
-skyscraper = rgb2gray(imread('skyscraper.jpg'));
+% skyscraper = rgb2gray(imread('skyscraper.jpg'));
 skyscraper_edges = findEdges(skyscraper, 4, 10);
 figure(2); subplot(1,2,1); imagesc(skyscraper_edges); colormap default;
-% subplot(1,2,2); imagesc(skyscraper_edges); colormap g;ray
-[rho, theta] = hough_(skyscraper_edges, 600, 500, 150);
+subplot(1,2,2); imagesc(skyscraper_edges); colormap gray
+[rho, theta] = hough_(skyscraper_edges, 600, 500, 90);
 figure(2); subplot(1,2,2); draw_hough_lines(skyscraper, rho, theta);

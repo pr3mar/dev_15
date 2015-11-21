@@ -22,9 +22,9 @@ function [out_rho, out_theta] = hough_(Ie,bins_rho, bins_theta, threshold)
             end
         end
     end
-    figure(1); subplot(1,2,1); imagesc(acc); axis tight; axis equal; colormap jet
+%     figure(1); subplot(1,2,1); imagesc(acc); axis tight; axis equal; colormap jet
     acc = nonmaxima_suppression_box(acc);
-    subplot(1,2,2); imagesc(acc); axis tight; axis equal; colormap jet
+%     subplot(1,2,2); imagesc(acc); axis tight; axis equal; colormap jet
 %     imagesc(acc); colormap jet
     thresholded = acc > threshold;
     [out_rho, out_theta] = find(thresholded);
