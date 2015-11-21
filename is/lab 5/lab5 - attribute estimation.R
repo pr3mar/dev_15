@@ -14,7 +14,7 @@ library(CORElearn)
 # Example 1
 #
 
-mr <- read.table("mushroom.txt", sep=",", header=T)
+mr <- read.table("../data/mushroom.txt", sep=",", header=T)
 summary(mr)
 
 barplot(table(mr$edibility), ylab="Number of species", main="Edibility of mushrooms")
@@ -38,7 +38,7 @@ plot(dt, mr)
 # Example 2
 #
 
-quadrant <- read.table("quadrant.txt", sep=",", header=T)
+quadrant <- read.table("../data/quadrant.txt", sep=",", header=T)
 summary(quadrant)
 
 quadrant$Class <- as.factor(quadrant$Class)

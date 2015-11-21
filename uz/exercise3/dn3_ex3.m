@@ -22,8 +22,8 @@
 % figure(2); subplot(1,2,2); draw_hough_lines(pier, rho, theta);
 
 skyscraper = rgb2gray(imread('skyscraper.jpg'));
-skyscraper_edges = findEdges(skyscraper, 2, 10);
+skyscraper_edges = findEdges(skyscraper, 4, 10);
 figure(2); subplot(1,2,1); imagesc(skyscraper_edges); colormap default;
 % subplot(1,2,2); imagesc(skyscraper_edges); colormap g;ray
-[rho, theta] = hough_(skyscraper_edges, 600, 500, 450);
+[rho, theta] = hough_(skyscraper_edges, 600, 500, 150);
 figure(2); subplot(1,2,2); draw_hough_lines(skyscraper, rho, theta);

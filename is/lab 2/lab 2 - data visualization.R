@@ -14,7 +14,7 @@ getwd()
 
 # To read data from a text file, use the "read.table" command.
 # The parameter header=TRUE indicates that the file to be read includes a first line with the column names
-md <- read.table(file="movies.txt", sep=",", header=TRUE)
+md <- read.table(file="../data/movies.txt", sep=",", header=TRUE)
 
 # To get more information on any specific named function, type "?" followed by the function name
 ?read.table
