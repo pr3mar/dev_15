@@ -1,11 +1,11 @@
-function [ R, auc, f, point] = get_roc( scores, groundworth )
+function [ R, auc, tsh, f, point] = get_roc( scores, groundworth )
     [scores, indices] = sort(scores,'descend');
     R = zeros(length(scores) + 1, 2)';
     auc = 0;
     fprev = -Inf;
     TP = 0; FP = 0; TPp = 0; FPp = 0; 
     p = length(groundworth(groundworth > 0)); n = length(groundworth) - p;
-    point = [1.0 0.0]; minDist = 1000;
+    point = [0.0 0.0]; minDist = 1000; tsh = 0;
     for i = 1:length(groundworth)
         if fprev ~= scores(i)
             auc = auc + trapezoid_area(FP, FPp, TP, TPp);
@@ -20,11 +20,12 @@ function [ R, auc, f, point] = get_roc( scores, groundworth )
         else
             FP = FP + 1;
         end
-         dist = sqrt(sum([1 0] - [R(2,i) R(1,i)]) .^ 2);
+%         dist = sqrt(sum([1 0] - [R(2,i) R(1,i)]) .^ 2);
+        dist = sqrt(sum(([0 1] - [R(2,i) R(1,i)]) .^ 2));
+%         R(2,i), R(1,i), dist
         if dist < minDist
+            tsh = scores(i);
             point(1) = R(2,i); point(2) = R(1,i);
-            precision = TP/(TP + FP);
-            recall = TP/p;
             minDist = dist;
         end
     end
@@ -32,7 +33,20 @@ function [ R, auc, f, point] = get_roc( scores, groundworth )
     R(2,i+1) = FP/n;
     auc = auc + trapezoid_area(FP, FPp, TP, TPp);
     auc = auc/(p * n);
-    f = 2/(1/precision + 1/recall);
+    
+    apply_tsh = scores >= tsh;
+    TP = 0; FP = 0;
+    for i = 1:numel(apply_tsh)
+        if apply_tsh(i) == 1 && apply_tsh(i) == groundworth(i)
+            TP = TP + 1;
+        elseif apply_tsh(i) == 0 && apply_tsh(i) == groundworth(i)
+            FP = FP + 1;
+        end
+    end
+    p = length(apply_tsh(scores >= tsh)); n = length(apply_tsh) - p;
+    precision = TP/(TP + FP);
+    recall = TP/p;
+    f = 2*(precision * recall)/(precision + recall);
 end
 
 function area = trapezoid_area(X1, X2, Y1, Y2)

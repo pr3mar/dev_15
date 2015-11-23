@@ -176,7 +176,7 @@ plot(rt.model);text(rt.model, pretty = 0)
 printcp(rt.model)
 
 # prune the tree using the complexity parameter associated with minimum error (eg xerror)
-rt.model2 <- prune(rt.model, cp = 0.02)
+rt.model2 <- prune(rt.model, cp = 0.02) # tudi za klasifikacijo!!
 plot(rt.model2)
 predicted <- predict(rt.model2, test.data)
 rmae(observed, predicted, mean(train.data$a1))
@@ -218,7 +218,7 @@ rmae(observed, predicted, mean(train.data$a1))
 # description of available parameters
 ?helpCore
 
-
+rt.core4 <- CoreModel(a1 ~ PO4 + size + mxPH, data = train.data, model="regTree", modelTypeReg = 3)
 
 #
 # random forest

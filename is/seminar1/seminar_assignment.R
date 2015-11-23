@@ -1,11 +1,19 @@
+# devide into test and learning set such as:
+# 1. test set is AFTER learning set, say 1994 - 2008 is learning, 2008 -> test set
+# 2. seasoning is very important! include it in the division
+# 3. divide the learning set into learning and validation set and do iterations to set the parameters.
+# 4. 
+
 # read the data
+setwd("D:/dev/dev_15/is/seminar1")
 pollution <- read.csv("pollution.txt")
 summary(pollution)
 str(pollution)
 date <- read.table(text = sapply(pollution$DATE, as.character), sep="-", colClasses = "factor", col.names = c("year", "month", "day"))
 pollution$DATE <- NULL
 pollution$YEAR <- date$year
-pollution$MONTH <- date$month
+pollution$MONTH <- date$month # discretisize for seasons
+pollution$SEASON <- cut(as.numeric(as.character(pollution$MONTH)), c(-Inf, 3, 7, 9, 11, Inf), labels = c("WINTER", "SPRING", "SUMMER", "AUTOMN", "WINTER"))
 pollution$TRAJ <- as.factor(pollution$TRAJ)
 pollution$SHORT_TRAJ <- as.factor(pollution$SHORT_TRAJ)
 
@@ -25,21 +33,25 @@ plot(pollution$SHORT_TRAJ)
 # day’s mean air temperature
 boxplot(pollution$AMP_TMP2M_mean)
 hist(pollution$AMP_TMP2M_mean)
+hist(log(pollution$AMP_TMP2M_mean))
 summary(pollution$AMP_TMP2M_mean)
 
 # day’s mean relative humidity
 boxplot(pollution$AMP_RH_mean)
 hist(pollution$AMP_RH_mean)
+hist(log(pollution$AMP_RH_mean))
 summary(pollution$AMP_RH_mean)
 
 # day’s mean wind speed
 boxplot(pollution$AMP_PREC_sum)
 hist(pollution$AMP_PREC_sum)
+hist(log(pollution$AMP_PREC_sum))
 summary(pollution$AMP_PREC_sum)
 
 #  day’s total precipitation
 boxplot(pollution$AMP_WS_mean)
 hist(pollution$AMP_WS_mean)
+hist(log(pollution$AMP_WS_mean))
 summary(pollution$AMP_WS_mean)
 
 
@@ -68,4 +80,4 @@ plot(pollution$AMP_TMP2M_mean + pollution$AMP_RH_mean, pollution$AMP_TMP2M_mean 
 
 # attribute evaluation
 library(CORElearn)
-sort(attrEval(O3_max ~ ., o3_data, "MDL"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data, "MDL"), decreasing = TRUE) # ni dobro! learn in test 
