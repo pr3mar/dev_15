@@ -1,9 +1,0 @@
-[histograms, classes, files] = load_histogram_database('images',8);
-id_selected = 5;
-selected = histograms(id_selected,:);
-% bar(histograms(5,:));
-% imagesc(imread(char(files(5))))
-distances = zeros(size(histograms,1),1);
-for i = 1:size(histograms,1)
-    distances(i) = distance(selected, histograms(i,:));
-end
