@@ -45,10 +45,10 @@ for i = 1:level
 %              mask_p{i}(iter_y(j), iter_x(j)) * eagle_p{k}{i}(iter_y(j), iter_x(j)) + ...
 %              (1 - mask_p{i}(iter_y(j), iter_x(j))) * sea_p{k}{i}(iter_y(j), iter_x(j));
         result_p{i}(iter_y(j), iter_x(j)) = ...
-              mask_p{i}(iter_y(j), iter_x(j)) * eagle_p{i}(iter_y(j), iter_x(j)) + ...
-              (1 - mask_p{i}(iter_y(j), iter_x(j))) * sea_p{i}(iter_y(j), iter_x(j));
+             mask_p{i}(iter_y(j), iter_x(j)) * eagle_p{i}(iter_y(j), iter_x(j)) + ...
+             (1 - mask_p{i(iter_y(j), iter_x(j))) * sea_p{i}(iter_y(j), iter_x(j));
 
     end
-    result = result + result_p{i};
+    result(:,:,k) = result(:,:,k) + result_p{k}{i};
 end
 figure(4); imagesc(result); colormap gray;
