@@ -29,8 +29,10 @@ function [ out_rho, out_theta ] = hough_find_lines_1...
     end
     
     
-    figure; imagesc(hough);
-    out_rho = rho_val;
-    out_theta = theta_val;
+    figure(2); imagesc(hough);
+    out_rho = (rho_val / bins_rho - 0.5) * 2 * D;
+    out_theta = (theta_val/ bins_theta - 0.5) * pi;
+%     out_rho = rho_val;
+%     out_theta = theta_val;
 end
 

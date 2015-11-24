@@ -1,4 +1,6 @@
 function [out_rho, out_theta] = hough_(Ie,bins_rho, bins_theta, threshold)
+    % works!
+
     acc = zeros(bins_rho, bins_theta);
     theta_vals = 0:(pi/bins_theta):pi; theta_vals = theta_vals(1:end-1);
 %     rho = -D:(2*D/bins_rho):D; rho = rho(2:end);

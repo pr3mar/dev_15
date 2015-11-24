@@ -4,6 +4,7 @@ function [ Ixx, Iyy, Ixy ] = image_derivatives( I, sigma )
     [Ix, Iy] = image_derivatives(I,sigma);
     Ixx = conv2(conv2(double(Ix), G'), D);
     Iyy = conv2(conv2(double(Iy), D'), G);
-    Ixy = conv2(conv2(double(I), D), D');
+%     Ixy = conv2(conv2(double(I), D), D');
+    Ixy = Ix + Iy;
 end
 

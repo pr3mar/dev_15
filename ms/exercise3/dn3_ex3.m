@@ -1,32 +1,31 @@
-% img1 = imread('underwater.jpg');
-% img2 = imread('eagle.jpg');
-% mask = rgb2gray(imread('eagle_mask.png'));
-% blended = blend_smooth(img1, img2, mask,5);
-% 
-% figure(1); clf; imagesc(blended);
+img1 = imread('autumn1.jpg');
+img2 = imread('autumn2.jpg');
+mask = rgb2gray(imread('autumn_mask.png'));
+smooth = blend_smooth(img1, img2, mask,5);
+binary = blend_binary(img1, img2, mask);
 
-% img = rgb2gray(imread('eagle.jpg'));
-% l = 4;
-% pyramid = laplace_pyramid(img, l);
-% g_p = gauss_pyramid(img, l);
-% % subplot(1,(l + 1), 1); imagesc(img); colormap gray; axis tight; axis equal;
-% figure(2); colormap gray;
-% for i = 1:l
-%     subplot(2, l, i);
-%     imagesc(g_p{i});
-%     axis tight; axis equal;
-%     
-%     subplot(2, l, i + l);
-%     imagesc(pyramid{i});
-%     axis tight; axis equal;
-% end
+img = rgb2gray(imread('eagle.jpg'));
+l = 4;
+pyramid = laplace_pyramid(img, l);
+g_p = gauss_pyramid(img, l);
+% subplot(1,(l + 1), 1); imagesc(img); colormap gray; axis tight; axis equal;
+figure(2); colormap gray;
+for i = 1:l
+    subplot(2, l, i);
+    imagesc(g_p{i});
+    axis tight; axis equal;
+    
+    subplot(2, l, i + l);
+    imagesc(pyramid{i});
+    axis tight; axis equal;
+end
 
 % sea = rgb2gray(imread('underwater.jpg'));
 % eagle = rgb2gray(imread('eagle.jpg'));
-mask = rgb2gray(imread('eagle_mask.png'));
+mask = rgb2gray(imread('autumn_mask.png'));
 level = 4;
-sea = imread('underwater.jpg');
-eagle = imread('eagle.jpg');
+sea = imread('autumn1.jpg');
+eagle = imread('autumn2.jpg');
 eagle_p = laplace_pyramid(eagle, level);
 sea_p = laplace_pyramid(sea, level);
 
@@ -38,7 +37,6 @@ sea_p = laplace_pyramid(sea, level);
 % end
 mask_p = gauss_pyramid(mask, level);
 result_p = sea_p;
-% figure(3); colormap gray;
 result = zeros(size(eagle));
 % for k = 1:3
     for i = 1:level
@@ -57,4 +55,8 @@ result = zeros(size(eagle));
         result = result + result_p{i};
     end
 % end
-figure(4); imagesc(uint8(result)); colormap gray;
+figure(1); clf; 
+subplot(1,3,1); imagesc(binary); axis tight; axis equal; title('binary');
+subplot(1,3,2); imagesc(smooth); axis tight; axis equal; title('smooth');
+subplot(1,3,3); imagesc(uint8(result)); axis tight; axis equal; title('laplace pyramid');
+figure(2);clf; imagesc(uint8(result)); axis tight; axis equal; title('laplace pyramid');

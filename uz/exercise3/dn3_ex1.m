@@ -33,8 +33,17 @@ subplot(2,4,2); imagesc(Ix); title('Ix');axis tight equal;
 subplot(2,4,3); imagesc(Iy); title('Iy'); axis tight equal;
 [Ixx, Iyy, Ixy] = image_derivatives2(museum, sigma);
 subplot(2,4,5); imagesc(Ixx); title('Ixx'); axis tight equal;
-subplot(2,4,6); imagesc(Iyy); title('Ixy'); axis tight equal;
+subplot(2,4,6); imagesc(Ixy); title('Ixy'); axis tight equal;
 subplot(2,4,7); imagesc(Iyy); title('Iyy'); axis tight equal;
 [Imag, Ideg] = gradient_magnitude(museum, sigma);
 subplot(2,4,4); imagesc(Imag); title('Imag'); axis tight equal;
 subplot(2,4,8); imagesc(Ideg); title('Ideg'); axis tight equal;
+
+% (d)
+img = rgb2gray(imread('lena.png'));
+sigma = sqrt(2); level = 5;
+img_pyramid = gauss_pyramid(img, sigma, level);
+figure(3); colormap gray;
+for i = 1:level
+    subplot(1,level, i); imagesc(uint8(img_pyramid{i})); axis equal; axis tight;
+end
