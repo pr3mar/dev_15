@@ -6,14 +6,16 @@ function [ R, auc, tsh, f, point] = get_roc( scores, groundworth )
     TP = 0; FP = 0; TPp = 0; FPp = 0; 
     p = length(groundworth(groundworth > 0)); n = length(groundworth) - p;
     point = [0.0 0.0]; minDist = 1000; tsh = 0;
+    counter = 1;
     for i = 1:length(groundworth)
         if fprev ~= scores(i)
             auc = auc + trapezoid_area(FP, FPp, TP, TPp);
-            R(1,i) = TP/p;
-            R(2,i) = FP/n;
+            R(1,counter) = TP/p;
+            R(2,counter) = FP/n;
             fprev = scores(i);
             TPp = TP;
             FPp = FP;
+            counter = counter + 1;
         end
         if groundworth(indices(i)) > 0
             TP = TP + 1;
@@ -21,16 +23,17 @@ function [ R, auc, tsh, f, point] = get_roc( scores, groundworth )
             FP = FP + 1;
         end
 %         dist = sqrt(sum([1 0] - [R(2,i) R(1,i)]) .^ 2);
-        dist = sqrt(sum(([0 1] - [R(2,i) R(1,i)]) .^ 2));
+        dist = sqrt(sum(([0 1] - [R(2,counter - 1) R(1,counter - 1)]) .^ 2));
 %         R(2,i), R(1,i), dist
         if dist < minDist
-            tsh = scores(i);
-            point(1) = R(2,i); point(2) = R(1,i);
+            tsh = scores(counter - 1);
+            point(1) = R(2,counter - 1); point(2) = R(1,counter - 1);
             minDist = dist;
         end
     end
-    R(1,i+1) = TP/p;
-    R(2,i+1) = FP/n;
+    R(1,counter) = TP/p;
+    R(2,counter) = FP/n;
+    R = R(:,1:counter);
     auc = auc + trapezoid_area(FP, FPp, TP, TPp);
     auc = auc/(p * n);
     
