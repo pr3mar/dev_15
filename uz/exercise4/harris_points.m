@@ -3,7 +3,7 @@ function [ px, py ] = harris_points( I, sigma, tsh )
     [Ix, Iy] = image_derivatives(I, sigma); Ixy = Ix .* Iy;
     Ix = Ix .^ 2; Iy = Iy .^ 2;
     G = gauss(sigma_t);
-    Igx = conv2(Ix, G); Igy = conv2(Iy, G); Igxy = conv2(Ixy, G);
+    Igx = conv2(Ix, G, 'same'); Igy = conv2(Iy, G, 'same'); Igxy = conv2(Ixy, G, 'same');
     figure(1); clf; colormap gray;  
 %     subplot(1,3,1); imshow(Igx);
 %     subplot(1,3,2); imshow(Igy);

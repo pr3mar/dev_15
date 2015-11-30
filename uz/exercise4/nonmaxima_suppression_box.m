@@ -4,6 +4,8 @@ function [ acc_ ] =  nonmaxima_suppression_box( acc, threshold )
     [h, w] = size(acc);
     [edge_y, edge_x] = find(acc > threshold);
     acc_ = zeros(h, w);
+    %TODO: make a box of BOX x BOX pixels
+    % 1px (9x9) is very small box
     for i = 1:numel(edge_y)
         set = true;
         for j = 1:numel(x_off)
