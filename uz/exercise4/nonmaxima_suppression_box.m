@@ -6,13 +6,12 @@ function [ acc_ ] =  nonmaxima_suppression_box( acc, threshold )
     acc_ = zeros(h, w);
     for i = 1:numel(edge_y)
         set = true;
-        if(acc(edge_y(i), edge_x(i)) <= threshold)
-            continue;
-        end;
-        for k = 1:numel(x_off)
-            x = edge_x(i) + x_off(k); y = edge_y(k) + y_off(k);
-            if (0 < x && x < h) && (0 < y && y < w) && ...
-                    acc_(edge_y(i), edge_x(i)) < acc_(x,y)
+        for j = 1:numel(x_off)
+            y = edge_y(i) + y_off(j); 
+            x = edge_x(i) + x_off(j);
+            if (0 < x) && (x < w) && ...
+                    (0 < y) && (y < h) && ...
+                        (acc(edge_y(j), edge_x(j)) < acc(y, x))
                 set = false;
                 break;
             end

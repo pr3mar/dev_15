@@ -8,6 +8,6 @@ function [ Ixx, Iyy, Ixy ] = image_derivatives2( I, sigma )
 
     Ixx = Ixx((1 + sigma*3):(end-sigma*3), (1 + sigma*3):(end-sigma*3));
     Iyy = Iyy((1 + sigma*3):(end-sigma*3), (1 + sigma*3):(end-sigma*3));
-    Ixy = Ix + Iy;
+    Ixy = Ix .* Iy;
 end
 
