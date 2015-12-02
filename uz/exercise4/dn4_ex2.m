@@ -28,7 +28,7 @@
 % displaymatches(img1, px1, py1, img2, px2, py2);
 
 % (c)
-img1 = rgb2gray(imread('graf/graf1.png'));  
+img1 = rgb2gray(imread('graf/graf1_small.png'));  
 img2 = rgb2gray(imread('graf/graf2_small.png'));
 sigma = 3; tsh = 100; bins = 100; m = 50;
 M = find_matches(img1, img2, sigma, tsh, bins, m);
