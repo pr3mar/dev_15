@@ -1,7 +1,7 @@
 img1 = imread('autumn1.jpg');
 img2 = imread('autumn2.jpg');
 mask = rgb2gray(imread('autumn_mask.png'));
-smooth = blend_smooth(img1, img2, mask,5);
+smooth = blend_smooth(img1, img2, mask, 5);
 binary = blend_binary(img1, img2, mask);
 
 img = rgb2gray(imread('eagle.jpg'));

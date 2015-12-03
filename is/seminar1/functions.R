@@ -17,3 +17,13 @@ rmse <- function(observed, predicted, mean.val) # relative mean squared error
 {  
   sum((observed - predicted)^2)/sum((observed - mean.val)^2)
 }
+
+
+all_errors <- function(observed, predicted, mean.val)
+{
+  e1 <- mae(observed, predicted)
+  e2 <- rmae(observed, predicted, mean.val)
+  e3 <- mse(observed, predicted)
+  e4 <- rmse(observed, predicted, mean.val)
+  c(e1, e2, e3, e4)
+}

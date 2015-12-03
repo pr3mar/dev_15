@@ -84,6 +84,13 @@ o3_data_reg.test <- o3_data_reg[o3_data_reg$YEAR > median(o3_data_reg$YEAR),]
 o3_data_reg.learn$YEAR <- NULL
 o3_data_reg.test$YEAR <- NULL
 
+# write.table(o3_data_reg.learn, quote=F,file="o3_data_reg_learn.tab", sep="\t", na="?", row.names = F)
+# write.table(o3_data_reg.test, quote=F,file="o3_data_reg_test.tab", sep="\t", na="?", row.names = F)
+
+
+### REGRESSION
+
+source("functions.R")
 
 set.seed(8678686)
 sel <- sample(1:nrow(o3_data_reg.learn), size=as.integer(nrow(o3_data_reg.learn)*0.7), replace=F)
@@ -91,7 +98,16 @@ o3_data_reg.learning <- o3_data_reg.learn[sel,]
 o3_data_reg.validation <- o3_data_reg.learn[-sel,]
 
 
-# source("functions.R")
+# linear regression
+o3.reg.lm <- lm(O3_max ~ ., o3_data_reg.learning)
+o3.predictions.lm <- predict(o3.reg.lm, o3_data_reg.validation)
+
+all_errors(o3_data_reg.validation$O3_max, o3.predictions.lm, mean(o3_data_reg.validation$O3_max))
+
+# regression tree
+library(rpart)
+
+
 
 
 # some graphs, need to recheck them.
