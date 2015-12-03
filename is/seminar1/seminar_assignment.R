@@ -9,75 +9,143 @@ setwd("D:/dev/dev_15/is/seminar1")
 pollution <- read.csv("pollution.txt")
 summary(pollution)
 str(pollution)
-date <- read.table(text = sapply(pollution$DATE, as.character), sep="-", colClasses = "factor", col.names = c("year", "month", "day"))
+date <- read.table(text = sapply(pollution$DATE, as.character), sep="-", colClasses = "integer", col.names = c("year", "month", "day"))
 pollution$DATE <- NULL
 pollution$YEAR <- date$year
 pollution$MONTH <- date$month # discretisize for seasons
-pollution$SEASON <- cut(as.numeric(as.character(pollution$MONTH)), c(-Inf, 3, 7, 9, 11, Inf), labels = c("WINTER", "SPRING", "SUMMER", "AUTOMN", "WINTER"))
+pollution$SEASON <- cut(as.numeric(as.character(pollution$MONTH)), c(-Inf, 3, 7, 9, 11, Inf), labels = c("WINTER", "SPRING", "SUMMER", "AUTOMN", "WINT"))
+levels(pollution$SEASON) <- c("WINTER", "SPRING", "SUMMER", "AUTOMN", "WINTER")
 pollution$TRAJ <- as.factor(pollution$TRAJ)
 pollution$SHORT_TRAJ <- as.factor(pollution$SHORT_TRAJ)
 
 # discretize o3_max data and divide it from the whole data
-o3_data = pollution[,c(0:7, 10,11)]
-o3_data <- o3_data[,o3_data != "NA"]
-o3_data$O3_max <- cut(pollution$O3_max, c(-Inf, 60, 120, 180, +Inf), labels=c("LOW", "MODERATE", "HIGH", "EXTREME"))
-o3_data <- o3_data[is.na(o3_data$O3_max) == F,] # remove NA values (for now)
-# discretize pm10 data and divide it from the whole data
-pm10_data = pollution[,c(0:6,8,10,11)]
-pm10_data$PM10 <- cut(pollution$PM10, c(-Inf, 35, 50, +Inf), labels=c("LOW", "MODERATE", "HIGH"))
-pm10_data <- pm10_data[is.na(pm10_data$PM10) == F,] # remove NA values (for now)
+o3_data = pollution[,c(1:7, 10,12)]
+o3_data <- o3_data[complete.cases(o3_data),]
+o3_data$O3_max <- cut(o3_data$O3_max, c(-Inf, 60, 120, 180, +Inf), labels=c("LOW", "MODERATE", "HIGH", "EXTREME"))
+#o3_data <- o3_data[is.na(o3_data$O3_max) == F,] # remove NA values (for now)
+summary(o3_data)
 
-plot(pollution$TRAJ)
-plot(pollution$SHORT_TRAJ)
+# write.table(o3_data, quote=F,file="o3_data.tab", sep="\t", na="?", row.names = F)
+o3_data.learn <- o3_data[o3_data$YEAR <= median(o3_data$YEAR),]
+o3_data.test <- o3_data[o3_data$YEAR > median(o3_data$YEAR),]
 
-# day’s mean air temperature
-boxplot(pollution$AMP_TMP2M_mean)
-hist(pollution$AMP_TMP2M_mean)
-hist(log(pollution$AMP_TMP2M_mean))
-summary(pollution$AMP_TMP2M_mean)
+o3_data.learn$YEAR <- NULL
+o3_data.test$YEAR <- NULL
 
-# day’s mean relative humidity
-boxplot(pollution$AMP_RH_mean)
-hist(pollution$AMP_RH_mean)
-hist(log(pollution$AMP_RH_mean))
-summary(pollution$AMP_RH_mean)
+# write.table(o3_data.learn, quote=F,file="o3_data_learn.tab", sep="\t", na="?", row.names = F)
+# write.table(o3_data.test, quote=F,file="o3_data_test.tab", sep="\t", na="?", row.names = F)
 
-# day’s mean wind speed
-boxplot(pollution$AMP_PREC_sum)
-hist(pollution$AMP_PREC_sum)
-hist(log(pollution$AMP_PREC_sum))
-summary(pollution$AMP_PREC_sum)
-
-#  day’s total precipitation
-boxplot(pollution$AMP_WS_mean)
-hist(pollution$AMP_WS_mean)
-hist(log(pollution$AMP_WS_mean))
-summary(pollution$AMP_WS_mean)
-
-
-hist(pollution$AMP_PREC_sum[pollution$AMP_PREC_sum > 0])
-
-hist(pollution$O3_max)
-hist(pollution$PM10)
-hist(pollution$PM2.5)
-
-length(pollution$AMP_PREC_sum[pollution$AMP_PREC_sum == "NA"])
-
-plot(pollution$AMP_WS_mean, pollution$AMP_RH_mean) # poln pogodok xD
-plot(pollution$AMP_WS_mean, pollution$AMP_TMP2M_mean)
-plot(pollution$AMP_WS_mean, pollution$PM10)
-plot(pollution$AMP_WS_mean, pollution$PM2.5)
-plot(pollution$AMP_WS_mean, pollution$O3_max)
-plot(pollution$AMP_TMP2M_mean, pollution$AMP_RH_mean) # poln pogodok xD
-
-plot(pollution$AMP_TMP2M_mean, pollution$AMP_WS_mean)
-
-plot(pollution$AMP_TMP2M_mean * pollution$AMP_RH_mean, pollution$AMP_TMP2M_mean + pollution$AMP_WS_mean) # ??? good regression - NO, you stupid assfuck
-
-plot(pollution$AMP_TMP2M_mean * pollution$AMP_RH_mean, pollution$AMP_WS_mean)
-boxplot(pollution$AMP_TMP2M_mean * pollution$AMP_RH_mean)
-plot(pollution$AMP_TMP2M_mean + pollution$AMP_RH_mean, pollution$AMP_TMP2M_mean * pollution$AMP_WS_mean)
-
-# attribute evaluation
 library(CORElearn)
-sort(attrEval(O3_max ~ ., o3_data, "MDL"), decreasing = TRUE) # ni dobro! learn in test 
+sort(attrEval(O3_max ~ ., o3_data.learn, "MDL"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data.learn, "InfGain"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data.learn, "Gini"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data.learn, "GainRatio"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data.learn, "ReliefFequalK"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data.learn, "Relief"), decreasing = TRUE)
+sort(attrEval(O3_max ~ ., o3_data.learn, "ReliefFexpRank"), decreasing = TRUE)
+
+
+# write.table(o3_data, quote=F,file="o3_data.tab", sep="\t", na="?", row.names = F)
+
+
+# discretize pm10 data and divide it from the whole data
+pm10_data = pollution[,c(1:6,8,10,12)]
+pm10_data = pm10_data[complete.cases(pm10_data),]
+pm10_data$PM10 <- cut(pm10_data$PM10, c(-Inf, 35, 50, +Inf), labels=c("LOW", "MODERATE", "HIGH"))
+#pm10_data <- pm10_data[is.na(pm10_data$PM10) == F,] # remove NA values (for now)
+
+pm10_data.learn <- pm10_data[pm10_data$YEAR <= median(pm10_data$YEAR),]
+pm10_data.test <- pm10_data[pm10_data$YEAR > median(pm10_data$YEAR),]
+
+pm10_data.learn$YEAR <- NULL
+pm10_data.test$YEAR <- NULL
+
+write.table(pm10_data.learn, quote=F,file="pm10_data_learn.tab", sep="\t", na="?", row.names = F)
+write.table(pm10_data.test, quote=F,file="pm10_data_test.tab", sep="\t", na="?", row.names = F)
+
+
+library(CORElearn)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "MDL"), decreasing = TRUE)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "InfGain"), decreasing = TRUE)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "Gini"), decreasing = TRUE)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "GainRatio"), decreasing = TRUE)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "ReliefFequalK"), decreasing = TRUE)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "Relief"), decreasing = TRUE)
+sort(attrEval(PM10 ~ ., pm10_data.learn, "ReliefFexpRank"), decreasing = TRUE)
+
+
+# regression O3
+o3_data_reg = pollution[,c(1:7, 10,12)]
+o3_data_reg <- o3_data_reg[complete.cases(o3_data_reg),]
+
+o3_data_reg.learn <- o3_data_reg[o3_data_reg$YEAR <= median(o3_data_reg$YEAR),]
+o3_data_reg.test <- o3_data_reg[o3_data_reg$YEAR > median(o3_data_reg$YEAR),]
+
+o3_data_reg.learn$YEAR <- NULL
+o3_data_reg.test$YEAR <- NULL
+
+
+set.seed(8678686)
+sel <- sample(1:nrow(o3_data_reg.learn), size=as.integer(nrow(o3_data_reg.learn)*0.7), replace=F)
+o3_data_reg.learning <- o3_data_reg.learn[sel,]
+o3_data_reg.validation <- o3_data_reg.learn[-sel,]
+
+
+# source("functions.R")
+
+
+# some graphs, need to recheck them.
+# plot(pollution$TRAJ)
+# plot(pollution$SHORT_TRAJ)
+# 
+# # day’s mean air temperature
+# boxplot(pollution$AMP_TMP2M_mean)
+# hist(pollution$AMP_TMP2M_mean)
+# hist(log(pollution$AMP_TMP2M_mean))
+# summary(pollution$AMP_TMP2M_mean)
+# 
+# # day’s mean relative humidity
+# boxplot(pollution$AMP_RH_mean)
+# hist(pollution$AMP_RH_mean)
+# hist(log(pollution$AMP_RH_mean))
+# summary(pollution$AMP_RH_mean)
+# 
+# # day’s mean wind speed
+# boxplot(pollution$AMP_PREC_sum)
+# hist(pollution$AMP_PREC_sum)
+# hist(log(pollution$AMP_PREC_sum))
+# summary(pollution$AMP_PREC_sum)
+# 
+# #  day’s total precipitation
+# boxplot(pollution$AMP_WS_mean)
+# hist(pollution$AMP_WS_mean)
+# hist(log(pollution$AMP_WS_mean))
+# summary(pollution$AMP_WS_mean)
+# 
+# 
+# hist(pollution$AMP_PREC_sum[pollution$AMP_PREC_sum > 0])
+# 
+# hist(pollution$O3_max)
+# hist(pollution$PM10)
+# hist(pollution$PM2.5)
+# 
+# length(pollution$AMP_PREC_sum[pollution$AMP_PREC_sum == "NA"])
+# 
+# plot(pollution$AMP_WS_mean, pollution$AMP_RH_mean) # poln pogodok xD
+# plot(pollution$AMP_WS_mean, pollution$AMP_TMP2M_mean)
+# plot(pollution$AMP_WS_mean, pollution$PM10)
+# plot(pollution$AMP_WS_mean, pollution$PM2.5)
+# plot(pollution$AMP_WS_mean, pollution$O3_max)
+# plot(pollution$AMP_TMP2M_mean, pollution$AMP_RH_mean) # poln pogodok xD
+# 
+# plot(pollution$AMP_TMP2M_mean, pollution$AMP_WS_mean)
+# 
+# plot(pollution$AMP_TMP2M_mean * pollution$AMP_RH_mean, pollution$AMP_TMP2M_mean + pollution$AMP_WS_mean) # ??? good regression - NO, you stupid assfuck
+# 
+# plot(pollution$AMP_TMP2M_mean * pollution$AMP_RH_mean, pollution$AMP_WS_mean)
+# boxplot(pollution$AMP_TMP2M_mean * pollution$AMP_RH_mean)
+# plot(pollution$AMP_TMP2M_mean + pollution$AMP_RH_mean, pollution$AMP_TMP2M_mean * pollution$AMP_WS_mean)
+# 
+# # attribute evaluation
+# library(CORElearn)
+# sort(attrEval(O3_max ~ ., o3_data, "MDL"), decreasing = TRUE) # ni dobro! learn in test 
