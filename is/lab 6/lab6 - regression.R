@@ -219,7 +219,9 @@ rmae(observed, predicted, mean(train.data$a1))
 ?helpCore
 
 rt.core4 <- CoreModel(a1 ~ PO4 + size + mxPH, data = train.data, model="regTree", modelTypeReg = 3)
-
+plot(rt.core4, train.data)
+predicted <- predict(rt.core4, test.data)
+rmae(observed, predicted, mean(train.data$a1))
 #
 # random forest
 #

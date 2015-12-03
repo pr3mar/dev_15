@@ -96,19 +96,42 @@ set.seed(8678686)
 sel <- sample(1:nrow(o3_data_reg.learn), size=as.integer(nrow(o3_data_reg.learn)*0.7), replace=F)
 o3_data_reg.learning <- o3_data_reg.learn[sel,]
 o3_data_reg.validation <- o3_data_reg.learn[-sel,]
-
+o3 <- o3_data_reg.validation$O3_max
 
 # linear regression
-o3.reg.lm <- lm(O3_max ~ ., o3_data_reg.learning)
-o3.predictions.lm <- predict(o3.reg.lm, o3_data_reg.validation)
+o3.reg.lm.model <- lm(O3_max ~ ., o3_data_reg.learning)
+o3.reg.lm.predictions <- predict(o3.reg.lm.model, o3_data_reg.validation)
 
-all_errors(o3_data_reg.validation$O3_max, o3.predictions.lm, mean(o3_data_reg.validation$O3_max))
+all_errors(o3, o3.reg.lm.predictions, mean(o3_data_reg.learning$O3_max))
 
 # regression tree
 library(rpart)
+o3.reg.regTree.model <- rpart(O3_max ~ ., o3_data_reg.learning,maxdepth = 5, minsplit= 4)
+o3.reg.regTree.prediction <- predict(o3.reg.regTree.model, o3_data_reg.validation)
+all_errors(o3, o3.reg.regTree.prediction, mean(o3_data_reg.learning$O3_max))
+plot(o3.reg.regTree.model);text(o3.reg.regTree.model, pretty = 0)
 
+library(CORElearn)
+o3.reg.coreReg.model <- CoreModel(O3_max ~ ., data=o3_data_reg.learning, model="regTree", modelTypeReg = 7) 
+# 7 is a winner
+o3.reg.coreReg.prediction <- predict(o3.reg.coreReg.model, o3_data_reg.validation)
+all_errors(o3, o3.reg.coreReg.prediction, mean(o3_data_reg.learning$O3_max))
 
+modelEval(o3.reg.coreReg.model, o3, o3.reg.coreReg.prediction)
 
+# random forest
+library(randomForest)
+
+o3.reg.rf.model <- randomForest(O3_max ~ ., o3_data_reg.learning)
+o3.reg.rf.prediction <- predict(o3.reg.rf.model, o3_data_reg.validation)
+all_errors(o3, o3.reg.rf.prediction, mean(o3_data_reg.learning$O3_max))
+
+# svm
+library(e1071)
+
+o3.reg.svm.model <- svm(O3_max ~ ., o3_data_reg.learning)
+o3.reg.svm.prediction <- predict(o3.reg.svm.model, o3_data_reg.validation)
+rmae(o3, o3.reg.svm.prediction, mean())
 
 # some graphs, need to recheck them.
 # plot(pollution$TRAJ)
