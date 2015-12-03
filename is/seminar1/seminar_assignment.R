@@ -102,20 +102,20 @@ o3 <- o3_data_reg.validation$O3_max
 o3.reg.lm.model <- lm(O3_max ~ ., o3_data_reg.learning)
 o3.reg.lm.predictions <- predict(o3.reg.lm.model, o3_data_reg.validation)
 
-all_errors(o3, o3.reg.lm.predictions, mean(o3_data_reg.learning$O3_max))
+all_errors(o3, o3.reg.lm.predictions, mean(o3))
 
 # regression tree
 library(rpart)
 o3.reg.regTree.model <- rpart(O3_max ~ ., o3_data_reg.learning,maxdepth = 5, minsplit= 4)
 o3.reg.regTree.prediction <- predict(o3.reg.regTree.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.regTree.prediction, mean(o3_data_reg.learning$O3_max))
+all_errors(o3, o3.reg.regTree.prediction, mean(o3))
 plot(o3.reg.regTree.model);text(o3.reg.regTree.model, pretty = 0)
 
 library(CORElearn)
 o3.reg.coreReg.model <- CoreModel(O3_max ~ ., data=o3_data_reg.learning, model="regTree", modelTypeReg = 7) 
 # 7 is a winner
 o3.reg.coreReg.prediction <- predict(o3.reg.coreReg.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.coreReg.prediction, mean(o3_data_reg.learning$O3_max))
+all_errors(o3, o3.reg.coreReg.prediction, mean(o3))
 
 modelEval(o3.reg.coreReg.model, o3, o3.reg.coreReg.prediction)
 
@@ -124,14 +124,38 @@ library(randomForest)
 
 o3.reg.rf.model <- randomForest(O3_max ~ ., o3_data_reg.learning)
 o3.reg.rf.prediction <- predict(o3.reg.rf.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.rf.prediction, mean(o3_data_reg.learning$O3_max))
+all_errors(o3, o3.reg.rf.prediction, mean(o3))
 
 # svm
 library(e1071)
 
-o3.reg.svm.model <- svm(O3_max ~ ., o3_data_reg.learning)
+o3.reg.svm.model <- svm(O3_max ~ ., o3_data_reg.learning, kernel="radial", fitted=F)
 o3.reg.svm.prediction <- predict(o3.reg.svm.model, o3_data_reg.validation)
-rmae(o3, o3.reg.svm.prediction, mean())
+all_errors(o3, o3.reg.svm.prediction, mean(o3))
+
+# k-nearest neighbor
+
+install.packages("kknn")
+library(kknn)
+
+knn.model <- kknn(a1 ~ ., train.data, test.data, k = 3)
+predicted <- fitted(knn.model)
+rmae(observed, predicted, mean(train.data$a1))
+
+
+# neural network
+
+library(nnet)
+
+#
+# important!!! 
+# in regression problems use linout = T
+
+#set.seed(6789)
+o3.reg.nn.model <- nnet(a1 ~ ., train.data, size = 5, decay = 1e-4, maxit = 10000, linout = T)
+predicted <- predict(nn.model, test.data)
+rmae(observed, predicted, mean(train.data$a1))
+
 
 # some graphs, need to recheck them.
 # plot(pollution$TRAJ)
