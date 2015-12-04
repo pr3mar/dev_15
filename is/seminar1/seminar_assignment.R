@@ -133,6 +133,9 @@ o3_data_reg <- o3_data_reg[complete.cases(o3_data_reg),]
 o3_data_reg.learn <- o3_data_reg[o3_data_reg$YEAR <= median(o3_data_reg$YEAR),]
 o3_data_reg.test <- o3_data_reg[o3_data_reg$YEAR > median(o3_data_reg$YEAR),]
 
+#attr evaluation
+
+
 o3_data_reg.learn$YEAR <- NULL
 o3_data_reg.test$YEAR <- NULL
 
@@ -146,20 +149,20 @@ o3_reg_err <- setNames(o3_reg_err, c("MAE", "RMAE", "MSE", "RMSE"))
 source("functions.R")
 
 
-# o3_reg_learning = F
-# 
-# if(o3_reg_learning == T) {
-#   # learning process
-#   set.seed(8678686)
-#   sel <- sample(1:nrow(o3_data_reg.learn), size=as.integer(nrow(o3_data_reg.learn)*0.7), replace=F)
-#   o3_data_reg.learning <- o3_data_reg.learn[sel,]
-#   o3_data_reg.validation <- o3_data_reg.learn[-sel,]
-#   o3 <- o3_data_reg.validation$O3_max
-# } else {
+o3_reg_learning = F
+
+if(o3_reg_learning == T) {
+  # learning process
+  set.seed(8678686)
+  sel <- sample(1:nrow(o3_data_reg.learn), size=as.integer(nrow(o3_data_reg.learn)*0.7), replace=F)
+  o3_data_reg.learning <- o3_data_reg.learn[sel,]
+  o3_data_reg.validation <- o3_data_reg.learn[-sel,]
+  o3 <- o3_data_reg.validation$O3_max
+} else {
   o3_data_reg.learning <- o3_data_reg.learn
   o3_data_reg.validation <- o3_data_reg.test
   o3 <- o3_data_reg.validation$O3_max
-# }
+}
 
 
 # linear regression
@@ -222,6 +225,10 @@ pm25_data_reg <- pm25_data_reg[complete.cases(pm25_data_reg),]
 pm25_data_reg.learn <- pm25_data_reg[pm25_data_reg$YEAR <= median(pm25_data_reg$YEAR),]
 pm25_data_reg.test <- pm25_data_reg[pm25_data_reg$YEAR > median(pm25_data_reg$YEAR),]
 
+
+#attr evaluation
+
+
 pm25_data_reg.learn$YEAR <- NULL
 pm25_data_reg.test$YEAR <- NULL
 
@@ -234,17 +241,17 @@ pm25_reg_err <- setNames(pm25_reg_err, c("MAE", "RMAE", "MSE", "RMSE"))
 
 pm25_reg_learning = F
 
-# if(pm25_reg_learning) {
-#   #separate the learning data into learning and validation (randomly)
-#   sel <- sample(1:nrow(pm25_data_reg.learn), size=as.integer(nrow(pm25_data_reg.learn)*0.7), replace=F)
-#   pm25_data_reg.learning <- pm25_data_reg.learn[sel,]
-#   pm25_data_reg.validation <- pm25_data_reg.learn[-sel,]
-#   pm25 <- pm25_data_reg.validation$PM2.5
-# } else {
+if(pm25_reg_learning) {
+  #separate the learning data into learning and validation (randomly)
+  sel <- sample(1:nrow(pm25_data_reg.learn), size=as.integer(nrow(pm25_data_reg.learn)*0.7), replace=F)
+  pm25_data_reg.learning <- pm25_data_reg.learn[sel,]
+  pm25_data_reg.validation <- pm25_data_reg.learn[-sel,]
+  pm25 <- pm25_data_reg.validation$PM2.5
+} else {
   pm25_data_reg.learning <- pm25_data_reg.learn
   pm25_data_reg.validation <- pm25_data_reg.test
   pm25 <- pm25_data_reg.validation$PM2.5
-# }
+}
 # linear regression
 pm25.reg.lm.model <- lm(PM2.5 ~ ., pm25_data_reg.learning)
 pm25.reg.lm.predictions <- predict(pm25.reg.lm.model, pm25_data_reg.validation)
@@ -255,7 +262,7 @@ library(rpart)
 pm25.reg.regTree.model <- rpart(PM2.5 ~ ., pm25_data_reg.learning,maxdepth = 5, minsplit= 4)
 pm25.reg.regTree.prediction <- predict(pm25.reg.regTree.model, pm25_data_reg.validation)
 pm25_reg_err <- rbind(pm25_reg_err, all_errors_reg(pm25, pm25.reg.regTree.prediction, mean(pm25_data_reg.learning$PM2.5)))
-plot(pm25.reg.regTree.model);text(pm25.reg.regTree.model, pretty = 0)
+# plot(pm25.reg.regTree.model);text(pm25.reg.regTree.model, pretty = 0)
 
 library(CORElearn)
 pm25.reg.coreReg.model <- CoreModel(PM2.5 ~ ., data=pm25_data_reg.learning, model="regTree", modelTypeReg = 7) # 7 is a winner
