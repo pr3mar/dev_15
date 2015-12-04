@@ -19,7 +19,7 @@ rmse <- function(observed, predicted, mean.val) # relative mean squared error
 }
 
 
-all_errors <- function(observed, predicted, mean.val)
+all_errors_reg <- function(observed, predicted, mean.val)
 {
   e1 <- mae(observed, predicted)
   e2 <- rmae(observed, predicted, mean.val)
