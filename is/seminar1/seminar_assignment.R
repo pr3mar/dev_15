@@ -60,8 +60,8 @@ pm10_data.test <- pm10_data[pm10_data$YEAR > median(pm10_data$YEAR),]
 pm10_data.learn$YEAR <- NULL
 pm10_data.test$YEAR <- NULL
 
-write.table(pm10_data.learn, quote=F,file="pm10_data_learn.tab", sep="\t", na="?", row.names = F)
-write.table(pm10_data.test, quote=F,file="pm10_data_test.tab", sep="\t", na="?", row.names = F)
+# write.table(pm10_data.learn, quote=F,file="pm10_data_learn.tab", sep="\t", na="?", row.names = F)
+# write.table(pm10_data.test, quote=F,file="pm10_data_test.tab", sep="\t", na="?", row.names = F)
 
 
 library(CORElearn)
@@ -84,6 +84,10 @@ o3_data_reg.test <- o3_data_reg[o3_data_reg$YEAR > median(o3_data_reg$YEAR),]
 o3_data_reg.learn$YEAR <- NULL
 o3_data_reg.test$YEAR <- NULL
 
+o3_reg_err <- data.frame()
+o3_reg_err <- rbind(o3_reg_err, c( 0, 0, 0, 0))
+o3_reg_err <- setNames(o3_reg_err, c("MAE", "RMAE", "MSE", "RMSE"))
+
 
 pm25_data_reg = pollution[,c(1:6, 9, 10, 12)]
 pm25_data_reg <- pm25_data_reg[complete.cases(pm25_data_reg),]
@@ -94,6 +98,9 @@ pm25_data_reg.test <- pm25_data_reg[pm25_data_reg$YEAR > median(pm25_data_reg$YE
 pm25_data_reg.learn$YEAR <- NULL
 pm25_data_reg.test$YEAR <- NULL
 
+pm25_reg_err <- data.frame()
+pm25_reg_err <- rbind(pm25_reg_err, c(0,0,0,0))
+pm25_reg_err <- setNames(pm25_reg_err, c("MAE", "RMAE", "MSE", "RMSE"))
 
 
 # write.table(o3_data_reg.learn, quote=F,file="o3_data_reg_learn.tab", sep="\t", na="?", row.names = F)
@@ -115,25 +122,25 @@ pm25 <- pm25_data_reg.validation$PM2.5
 # linear regression
 o3.reg.lm.model <- lm(O3_max ~ ., o3_data_reg.learning)
 o3.reg.lm.predictions <- predict(o3.reg.lm.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.lm.predictions, mean(o3))
+o3_reg_err[1,] <-all_errors(o3, o3.reg.lm.predictions, mean(o3_data_reg.learning$O3_max))
 
 pm25.reg.lm.model <- lm(PM2.5 ~ ., pm25_data_reg.learning)
 pm25.reg.lm.predictions <- predict(pm25.reg.lm.model, pm25_data_reg.validation)
-all_errors(pm25, pm25.reg.lm.predictions, mean(pm25))
+pm25_reg_err[1,] <- all_errors(pm25, pm25.reg.lm.predictions, mean(pm25_data_reg.learning$PM2.5))
 
 
 # regression tree
 library(rpart)
 o3.reg.regTree.model <- rpart(O3_max ~ ., o3_data_reg.learning,maxdepth = 5, minsplit= 4)
 o3.reg.regTree.prediction <- predict(o3.reg.regTree.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.regTree.prediction, mean(o3))
+o3_reg_err <- rbind(o3_reg_err, all_errors(o3, o3.reg.regTree.prediction, mean(o3_data_reg.learning$O3_max)))
 plot(o3.reg.regTree.model);text(o3.reg.regTree.model, pretty = 0)
 
 library(CORElearn)
 o3.reg.coreReg.model <- CoreModel(O3_max ~ ., data=o3_data_reg.learning, model="regTree", modelTypeReg = 7) 
 # 7 is a winner
 o3.reg.coreReg.prediction <- predict(o3.reg.coreReg.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.coreReg.prediction, mean(o3))
+o3_reg_err <- rbind(o3_reg_err, all_errors(o3, o3.reg.coreReg.prediction, mean(o3_data_reg.learning$O3_max)))
 
 modelEval(o3.reg.coreReg.model, o3, o3.reg.coreReg.prediction)
 
@@ -142,14 +149,14 @@ modelEval(o3.reg.coreReg.model, o3, o3.reg.coreReg.prediction)
 library(rpart)
 pm25.reg.regTree.model <- rpart(PM2.5 ~ ., pm25_data_reg.learning,maxdepth = 5, minsplit= 4)
 pm25.reg.regTree.prediction <- predict(pm25.reg.regTree.model, pm25_data_reg.validation)
-all_errors(pm25, pm25.reg.regTree.prediction, mean(pm25))
+pm25_reg_err <- rbind(pm25_reg_err, all_errors(pm25, pm25.reg.regTree.prediction, mean(pm25_data_reg.learning$PM2.5)))
 plot(pm25.reg.regTree.model);text(pm25.reg.regTree.model, pretty = 0)
 
 library(CORElearn)
 pm25.reg.coreReg.model <- CoreModel(PM2.5 ~ ., data=pm25_data_reg.learning, model="regTree", modelTypeReg = 7) 
 # 7 is a winner
 pm25.reg.coreReg.prediction <- predict(pm25.reg.coreReg.model, pm25_data_reg.validation)
-all_errors(pm25, pm25.reg.coreReg.prediction, mean(pm25))
+pm25_reg_err <- rbind(pm25_reg_err, all_errors(pm25, pm25.reg.coreReg.prediction, mean(pm25_data_reg.learning$PM2.5)))
 
 modelEval(pm25.reg.coreReg.model, pm25, pm25.reg.coreReg.prediction)
 
@@ -158,54 +165,59 @@ library(randomForest)
 
 o3.reg.rf.model <- randomForest(O3_max ~ ., o3_data_reg.learning)
 o3.reg.rf.prediction <- predict(o3.reg.rf.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.rf.prediction, mean(o3))
+o3_reg_err <- rbind(o3_reg_err, all_errors(o3, o3.reg.rf.prediction, mean(o3_data_reg.learning$O3_max)))
 
 
 pm25.reg.rf.model <- randomForest(PM2.5 ~ ., pm25_data_reg.learning)
 pm25.reg.rf.prediction <- predict(pm25.reg.rf.model, pm25_data_reg.validation)
-all_errors(pm25, pm25.reg.rf.prediction, mean(pm25))
+pm25_reg_err <- rbind(pm25_reg_err, all_errors(pm25, pm25.reg.rf.prediction, mean(pm25_data_reg.learning$PM2.5)))
 
 # svm
 library(e1071)
 
 o3.reg.svm.model <- svm(O3_max ~ ., o3_data_reg.learning, kernel="radial", fitted=F)
 o3.reg.svm.prediction <- predict(o3.reg.svm.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.svm.prediction, mean(o3))
+o3_reg_err <- rbind(o3_reg_err, all_errors(o3, o3.reg.svm.prediction, mean(o3_data_reg.learning$O3_max)))
 
 
 pm25.reg.svm.model <- svm(PM2.5 ~ ., pm25_data_reg.learning, kernel="radial", fitted=F)
 pm25.reg.svm.prediction <- predict(pm25.reg.svm.model, pm25_data_reg.validation)
-all_errors(pm25, pm25.reg.svm.prediction, mean(pm25))
+pm25_reg_err <- rbind(pm25_reg_err, all_errors(pm25, pm25.reg.svm.prediction, mean(pm25_data_reg.learning$PM2.5)))
 
 # k-nearest neighbor
 library(kknn)
 
 o3.reg.knn.model <- kknn(O3_max ~ ., o3_data_reg.learning, o3_data_reg.validation, k = 3)
 o3.reg.knn.prediction <- fitted(o3.reg.knn.model)
-all_errors(o3, o3.reg.knn.prediction, mean(o3))
+o3_reg_err <- rbind( o3_reg_err, all_errors(o3, o3.reg.knn.prediction, mean(o3_data_reg.learning$O3_max)))
 
 
 pm25.reg.knn.model <- kknn(PM2.5 ~ ., pm25_data_reg.learning, pm25_data_reg.validation, k = 3)
 pm25.reg.knn.prediction <- fitted(pm25.reg.knn.model)
-all_errors(pm25, pm25.reg.knn.prediction, mean(pm25))
+pm25_reg_err <- rbind(pm25_reg_err, all_errors(pm25, pm25.reg.knn.prediction, mean(pm25_data_reg.learning$PM2.5)))
 
 # neural network
 library(nnet)
-#set.seed(6789)
+
 o3.reg.nn.model <- nnet(O3_max ~ ., o3_data_reg.learning, size = 10, decay = 1e-10, maxit = 10000, linout = T, Hess=T)
 o3.reg.nn.prediction <- predict(o3.reg.nn.model, o3_data_reg.validation)
-all_errors(o3, o3.reg.nn.prediction, mean(o3))
+o3_reg_err <- rbind( o3_reg_err,  all_errors(o3, o3.reg.nn.prediction, mean(o3_data_reg.learning$O3_max)))
 
 
-pm25.reg.nn.model <- nnet(PM2.5 ~ ., pm25_data_reg.learning, size = 10, decay = 1e-10, maxit = 10000, linout = T)
+pm25.reg.nn.model <- nnet(PM2.5 ~ ., pm25_data_reg.learning, size = 25, maxit = 10000, linout = T, Hess=T)
 pm25.reg.nn.prediction <- predict(pm25.reg.nn.model, pm25_data_reg.validation)
-all_errors(pm25, pm25.reg.nn.prediction, mean(pm25))
+all_errors(pm25, pm25.reg.nn.prediction, mean(pm25_data_reg.learning$PM2.5))
+# pm25_reg_err <- rbind(pm25_reg_err, all_errors(pm25, pm25.reg.nn.prediction, mean(pm25_data_reg.learning$PM2.5)))
 
 
-source("wrapperReg.R")
-wrapperReg(o3_data_reg.learning, "O3_max", folds=10)
+rownames(o3_reg_err) <- c("LR", "RT1", "RT2", "RF", "SVM", "kNN", "NNet")
+rownames(pm25_reg_err) <- c("LR", "RT1", "RT2", "RF", "SVM", "kNN", "NNet")
 
-wrapperReg(pm25_data_reg.learning, "PM2.5", folds=10)
+
+
+# source("wrapperReg.R")
+# wrapperReg(o3_data_reg.learning, "O3_max", folds=10)
+# wrapperReg(pm25_data_reg.learning, "PM2.5", folds=10)
 
 
 # some graphs, need to recheck them.
@@ -219,8 +231,8 @@ wrapperReg(pm25_data_reg.learning, "PM2.5", folds=10)
 # summary(pollution$AMP_TMP2M_mean)
 # 
 # # day’s mean relative humidity
-# boxplot(pollution$AMP_RH_mean)
-# hist(pollution$AMP_RH_mean)
+# boxplot(pollution$AMP_RH_mean)# hist(pollution$AMP_RH_mean)
+
 # hist(log(pollution$AMP_RH_mean))
 # summary(pollution$AMP_RH_mean)
 # 
