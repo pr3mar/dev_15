@@ -74,8 +74,8 @@ sort(attrEval(PM10 ~ ., pm10_data.learn, "Relief"), decreasing = TRUE)
 sort(attrEval(PM10 ~ ., pm10_data.learn, "ReliefFexpRank"), decreasing = TRUE)
 
 
-# regression O3
-o3_data_reg = pollution[,c(1:7, 10,12)]
+### REGRESSION
+o3_data_reg = pollution[,c(1:7, 10, 12)]
 o3_data_reg <- o3_data_reg[complete.cases(o3_data_reg),]
 
 o3_data_reg.learn <- o3_data_reg[o3_data_reg$YEAR <= median(o3_data_reg$YEAR),]
@@ -84,11 +84,20 @@ o3_data_reg.test <- o3_data_reg[o3_data_reg$YEAR > median(o3_data_reg$YEAR),]
 o3_data_reg.learn$YEAR <- NULL
 o3_data_reg.test$YEAR <- NULL
 
+
+pm25_data_reg = pollution[,c(1:6, 9, 10, 12)]
+pm25_data_reg <- pm25_data_reg[complete.cases(pm25_data_reg),]
+
+pm25_data_reg.learn <- pm25_data_reg[pm25_data_reg$YEAR <= median(pm25_data_reg$YEAR),]
+pm25_data_reg.test <- pm25_data_reg[pm25_data_reg$YEAR > median(pm25_data_reg$YEAR),]
+
+pm25_data_reg.learn$YEAR <- NULL
+pm25_data_reg.test$YEAR <- NULL
+
+
+
 # write.table(o3_data_reg.learn, quote=F,file="o3_data_reg_learn.tab", sep="\t", na="?", row.names = F)
 # write.table(o3_data_reg.test, quote=F,file="o3_data_reg_test.tab", sep="\t", na="?", row.names = F)
-
-
-### REGRESSION
 
 source("functions.R")
 
@@ -98,11 +107,20 @@ o3_data_reg.learning <- o3_data_reg.learn[sel,]
 o3_data_reg.validation <- o3_data_reg.learn[-sel,]
 o3 <- o3_data_reg.validation$O3_max
 
+sel <- sample(1:nrow(pm25_data_reg.learn), size=as.integer(nrow(pm25_data_reg.learn)*0.7), replace=F)
+pm25_data_reg.learning <- pm25_data_reg.learn[sel,]
+pm25_data_reg.validation <- pm25_data_reg.learn[-sel,]
+pm25 <- pm25_data_reg.validation$PM2.5
+
 # linear regression
 o3.reg.lm.model <- lm(O3_max ~ ., o3_data_reg.learning)
 o3.reg.lm.predictions <- predict(o3.reg.lm.model, o3_data_reg.validation)
-
 all_errors(o3, o3.reg.lm.predictions, mean(o3))
+
+pm25.reg.lm.model <- lm(PM2.5 ~ ., pm25_data_reg.learning)
+pm25.reg.lm.predictions <- predict(pm25.reg.lm.model, pm25_data_reg.validation)
+all_errors(pm25, pm25.reg.lm.predictions, mean(pm25))
+
 
 # regression tree
 library(rpart)
@@ -119,12 +137,33 @@ all_errors(o3, o3.reg.coreReg.prediction, mean(o3))
 
 modelEval(o3.reg.coreReg.model, o3, o3.reg.coreReg.prediction)
 
+
+
+library(rpart)
+pm25.reg.regTree.model <- rpart(PM2.5 ~ ., pm25_data_reg.learning,maxdepth = 5, minsplit= 4)
+pm25.reg.regTree.prediction <- predict(pm25.reg.regTree.model, pm25_data_reg.validation)
+all_errors(pm25, pm25.reg.regTree.prediction, mean(pm25))
+plot(pm25.reg.regTree.model);text(pm25.reg.regTree.model, pretty = 0)
+
+library(CORElearn)
+pm25.reg.coreReg.model <- CoreModel(PM2.5 ~ ., data=pm25_data_reg.learning, model="regTree", modelTypeReg = 7) 
+# 7 is a winner
+pm25.reg.coreReg.prediction <- predict(pm25.reg.coreReg.model, pm25_data_reg.validation)
+all_errors(pm25, pm25.reg.coreReg.prediction, mean(pm25))
+
+modelEval(pm25.reg.coreReg.model, pm25, pm25.reg.coreReg.prediction)
+
 # random forest
 library(randomForest)
 
 o3.reg.rf.model <- randomForest(O3_max ~ ., o3_data_reg.learning)
 o3.reg.rf.prediction <- predict(o3.reg.rf.model, o3_data_reg.validation)
 all_errors(o3, o3.reg.rf.prediction, mean(o3))
+
+
+pm25.reg.rf.model <- randomForest(PM2.5 ~ ., pm25_data_reg.learning)
+pm25.reg.rf.prediction <- predict(pm25.reg.rf.model, pm25_data_reg.validation)
+all_errors(pm25, pm25.reg.rf.prediction, mean(pm25))
 
 # svm
 library(e1071)
@@ -133,28 +172,40 @@ o3.reg.svm.model <- svm(O3_max ~ ., o3_data_reg.learning, kernel="radial", fitte
 o3.reg.svm.prediction <- predict(o3.reg.svm.model, o3_data_reg.validation)
 all_errors(o3, o3.reg.svm.prediction, mean(o3))
 
-# k-nearest neighbor
 
-install.packages("kknn")
+pm25.reg.svm.model <- svm(PM2.5 ~ ., pm25_data_reg.learning, kernel="radial", fitted=F)
+pm25.reg.svm.prediction <- predict(pm25.reg.svm.model, pm25_data_reg.validation)
+all_errors(pm25, pm25.reg.svm.prediction, mean(pm25))
+
+# k-nearest neighbor
 library(kknn)
 
-knn.model <- kknn(a1 ~ ., train.data, test.data, k = 3)
-predicted <- fitted(knn.model)
-rmae(observed, predicted, mean(train.data$a1))
+o3.reg.knn.model <- kknn(O3_max ~ ., o3_data_reg.learning, o3_data_reg.validation, k = 3)
+o3.reg.knn.prediction <- fitted(o3.reg.knn.model)
+all_errors(o3, o3.reg.knn.prediction, mean(o3))
 
+
+pm25.reg.knn.model <- kknn(PM2.5 ~ ., pm25_data_reg.learning, pm25_data_reg.validation, k = 3)
+pm25.reg.knn.prediction <- fitted(pm25.reg.knn.model)
+all_errors(pm25, pm25.reg.knn.prediction, mean(pm25))
 
 # neural network
-
 library(nnet)
-
-#
-# important!!! 
-# in regression problems use linout = T
-
 #set.seed(6789)
-o3.reg.nn.model <- nnet(a1 ~ ., train.data, size = 5, decay = 1e-4, maxit = 10000, linout = T)
-predicted <- predict(nn.model, test.data)
-rmae(observed, predicted, mean(train.data$a1))
+o3.reg.nn.model <- nnet(O3_max ~ ., o3_data_reg.learning, size = 10, decay = 1e-10, maxit = 10000, linout = T, Hess=T)
+o3.reg.nn.prediction <- predict(o3.reg.nn.model, o3_data_reg.validation)
+all_errors(o3, o3.reg.nn.prediction, mean(o3))
+
+
+pm25.reg.nn.model <- nnet(PM2.5 ~ ., pm25_data_reg.learning, size = 10, decay = 1e-10, maxit = 10000, linout = T)
+pm25.reg.nn.prediction <- predict(pm25.reg.nn.model, pm25_data_reg.validation)
+all_errors(pm25, pm25.reg.nn.prediction, mean(pm25))
+
+
+source("wrapperReg.R")
+wrapperReg(o3_data_reg.learning, "O3_max", folds=10)
+
+wrapperReg(pm25_data_reg.learning, "PM2.5", folds=10)
 
 
 # some graphs, need to recheck them.
