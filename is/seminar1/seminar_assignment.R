@@ -13,7 +13,7 @@ pollution$SHORT_TRAJ <- as.factor(pollution$SHORT_TRAJ)
 #
 ### SOME VISUALISATION
 ## rest of it is done in Orange.
-#
+
 summary(pollution)
 str(pollution)
 
@@ -21,7 +21,7 @@ plot(pollution$TRAJ)
 plot(pollution$SHORT_TRAJ)
 
 # day’s mean air temperature
-boxplot(pollution$AMP_TMP2M_mean)
+boxplot(pollution$AMP_TMP2M_mean, names="Mean air temperature")
 hist(pollution$AMP_TMP2M_mean)
 hist(log(pollution$AMP_TMP2M_mean))
 summary(pollution$AMP_TMP2M_mean)
