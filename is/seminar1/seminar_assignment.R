@@ -17,6 +17,8 @@ levels(pollution$SEASON) <- c("WINTER", "SPRING", "SUMMER", "AUTOMN", "WINTER")
 pollution$TRAJ <- as.factor(pollution$TRAJ)
 pollution$SHORT_TRAJ <- as.factor(pollution$SHORT_TRAJ)
 
+# write.table(pollution, quote=F,file="pollution_learn.txt", sep="\t", na="?", row.names = F)
+
 #
 ### SOME VISUALISATIONS
 ## rest of it is done in Orange.
