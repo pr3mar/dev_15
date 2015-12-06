@@ -1,4 +1,11 @@
 ### DATA PREPARATION
+library(ipred)
+library(rpart)
+library(CORElearn)
+library(e1071)
+library(randomForest)
+library(kernlab)
+library(nnet)
 setwd("D:/dev/dev_15/is/seminar1")
 pollution <- read.csv("pollution.txt")
 date <- read.table(text = sapply(pollution$DATE, as.character), sep="-", colClasses = "integer", col.names = c("year", "month", "day"))
@@ -11,7 +18,7 @@ pollution$TRAJ <- as.factor(pollution$TRAJ)
 pollution$SHORT_TRAJ <- as.factor(pollution$SHORT_TRAJ)
 
 #
-### SOME VISUALISATION
+### SOME VISUALISATIONS
 ## rest of it is done in Orange.
 
 summary(pollution)
@@ -23,7 +30,7 @@ plot(pollution$SHORT_TRAJ)
 # day’s mean air temperature
 boxplot(pollution$AMP_TMP2M_mean, names="Mean air temperature")
 hist(pollution$AMP_TMP2M_mean)
-hist(log(pollution$AMP_TMP2M_mean))
+# hist(log(pollution$AMP_TMP2M_mean))
 summary(pollution$AMP_TMP2M_mean)
 
 # day’s mean relative humidity
@@ -80,6 +87,16 @@ o3_data.test$YEAR <- NULL
 # write.table(o3_data.learn, quote=F,file="o3_data_learn.tab", sep="\t", na="?", row.names = F)
 # write.table(o3_data.test, quote=F,file="o3_data_test.tab", sep="\t", na="?", row.names = F)
 
+
+set.seed(8678686)
+sel <- sample(1:nrow(o3_data.learn), size=as.integer(nrow(o3_data.learn)*0.7), replace=F)
+# o3_data_learning <- o3_data.learn[sel,]
+# o3_data_validation <- o3_data.learn[-sel,]
+
+o3_data_learning <- o3_data.learn
+o3_data_validation <- o3_data.test
+
+
 library(CORElearn)
 sort(attrEval(O3_max ~ ., o3_data.learn, "MDL"), decreasing = TRUE)
 sort(attrEval(O3_max ~ ., o3_data.learn, "InfGain"), decreasing = TRUE)
@@ -88,6 +105,159 @@ sort(attrEval(O3_max ~ ., o3_data.learn, "GainRatio"), decreasing = TRUE)
 sort(attrEval(O3_max ~ ., o3_data.learn, "ReliefFequalK"), decreasing = TRUE)
 sort(attrEval(O3_max ~ ., o3_data.learn, "Relief"), decreasing = TRUE)
 sort(attrEval(O3_max ~ ., o3_data.learn, "ReliefFexpRank"), decreasing = TRUE)
+
+observed <- o3_data_validation$O3_max
+obsMat <- model.matrix(~O3_max-1, o3_data_validation)
+CA <- function(observed, predicted)
+{
+  t <- table(observed, predicted)
+  
+  sum(diag(t)) / sum(t)
+}
+brier.score <- function(observedMatrix, predictedMatrix)
+{
+  sum((observedMatrix - predictedMatrix) ^ 2) / nrow(predictedMatrix)
+}
+mypredict.generic <- function(object, newdata){predict(object, newdata, type = "class")}
+mymodel.coremodel <- function(formula, data, target.model){CoreModel(formula, data, model=target.model)}
+mypredict.coremodel <- function(object, newdata) {pred <- predict(object, newdata)$class; destroyModels(object); pred}
+#
+#
+# DECISION TREES
+#
+#
+# fit a model using the "rpart" library
+dt <- rpart(O3_max ~ ., data = o3_data_learning)
+plot(dt);text(dt)
+predicted <- predict(dt, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(dt, o3_data_validation, type = "prob")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = rpart, predict = mypredict.generic)
+decision_tree = c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "CORElearn" library
+cm.dt <- CoreModel(O3_max ~ ., data = o3_data_learning, model="tree")
+plot(cm.dt, o3_data_learning)
+predicted <- predict(cm.dt, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.dt, o3_data_validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="tree")
+decision_tree = c(decision_tree, CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# NAIVE BAYES CLASSIFIER
+#
+#
+# fit a model using the "e1071" library
+nb <- naiveBayes(O3_max ~ ., data = o3_data_learning, laplace = 3)
+predicted <- predict(nb, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(nb, o3_data_validation, type = "raw")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = naiveBayes, predict = mypredict.generic)
+naive_bayes=c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "CORElearn" library
+cm.nb <- CoreModel(O3_max ~ ., data = o3_data_learning, model="bayes")
+predicted <- predict(cm.nb, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.nb, o3_data_validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="bayes")
+naive_bayes=c(naive_bayes, CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# KNN
+#
+#
+# fit a model using the "CORElearn" library
+cm.knn <- CoreModel(O3_max ~ ., data = o3_data_learning, model="knn", kInNN = 20)
+predicted <- predict(cm.knn, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.knn, o3_data_validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="knn")
+knn_model=c(CA(observed, predicted), brier.score(obsMat, predMat))
+
+#
+#
+# SVM
+#
+#
+#
+sm <- svm(O3_max ~ ., data = o3_data_learning, gamma = 0.1)
+predicted <- predict(sm, o3_data_validation, type="class")
+CA(observed, predicted)
+sm <- svm(O3_max ~ ., o3_data_learning, probability = T)
+pred <- predict(sm, o3_data_validation, probability = T)
+predMat <- attr(pred, "probabilities")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = svm, predict = mypredict.generic)
+svm_model=c(CA(observed, predicted), brier.score(obsMat, predMat))
+
+
+model.svm <- ksvm(O3_max ~ ., data = o3_data_learning, kernel = "rbfdot")
+predicted <- predict(model.svm, o3_data_validation, type = "response")
+CA(observed, predicted)
+model.svm <- ksvm(O3_max ~ ., data = o3_data_learning, kernel = "rbfdot", prob.model = T)
+predMat <- predict(model.svm, o3_data_validation, type = "prob")
+brier.score(obsMat, predMat)
+mypredict.ksvm <- function(object, newdata){predict(object, newdata, type = "response")}
+errorest(O3_max~., data=o3_data_learning, model = ksvm, predict = mypredict.ksvm)
+svm_model=c(svm_model, CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# NEURAL NETWORKS
+#
+#
+#
+scale.data <- function(data)
+{
+  norm.data <- data
+  
+  for (i in 1:ncol(data))
+  {
+    if (!is.factor(data[,i]))
+      norm.data[,i] <- scale(data[,i])
+  }
+  
+  norm.data
+}
+norm.data <- scale.data(rbind(o3_data_learning,o3_data_validation))
+norm.learn <- norm.data[1:nrow(o3_data_learning),]
+norm.test <- norm.data[-(1:nrow(o3_data_learning)),]
+set.seed(1000)
+nn <- nnet(O3_max ~ ., data = norm.learn, size = 5,rang = 0.01, decay = 0.0000001, maxit = 10000000)
+predicted <- predict(nn, norm.test, type = "class")
+CA(observed, predicted)
+predMat <- predict(nn, norm.test, type = "raw")
+brier.score(obsMat, predMat)
+mypredict.nnet <- function(object, newdata){as.factor(predict(object, newdata, type = "class"))}
+errorest(O3_max~., data=norm.learn, model = nnet, predict = mypredict.nnet, size = 5, decay = 0.0001, maxit = 10000)
+neural_network=c(CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# RANDOM FOREST
+#
+#
+#
+rf <- randomForest(O3_max ~ ., data = o3_data_learning)
+predicted <- predict(rf, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(rf, o3_data_validation, type = "prob")
+brier.score(obsMat, predMat)
+mypredict.rf <- function(object, newdata){predict(object, newdata, type = "class")}
+errorest(O3_max~., data=o3_data_learning, model = randomForest, predict = mypredict.generic)
+random_forest_model=c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "CORElearn" library
+cm.rf <- CoreModel(O3_max ~ ., data = o3_data_learning, model="rf")
+predicted <- predict(cm.rf, o3_data_validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.rf, o3_data_validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(O3_max~., data=o3_data_learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="rf")
+random_forest_model=c(random_forest_model, CA(observed, predicted), brier.score(obsMat, predMat))
+o3_max_clas_res<-data.frame(decision_tree, naive_bayes, knn_model, svm_model, neural_network, random_forest_model)
 
 
 # write.table(o3_data, quote=F,file="o3_data.tab", sep="\t", na="?", row.names = F)
@@ -110,8 +280,15 @@ pm10_data.test$YEAR <- NULL
 # write.table(pm10_data.learn, quote=F,file="pm10_data_learn.tab", sep="\t", na="?", row.names = F)
 # write.table(pm10_data.test, quote=F,file="pm10_data_test.tab", sep="\t", na="?", row.names = F)
 
+set.seed(8678686)
+sel <- sample(1:nrow(pm10_data.learn), size=as.integer(nrow(pm10_data.learn)*0.7), replace=F)
+# pm10_data.learning <- pm10_data.learn[sel,]
+# pm10_data.validation <- pm10_data.learn[-sel,]
+pm10_data.learning <- pm10_data.learn
+pm10_data.validation <- pm10_data.test
 
-library(CORElearn)
+
+
 sort(attrEval(PM10 ~ ., pm10_data.learn, "MDL"), decreasing = TRUE)
 sort(attrEval(PM10 ~ ., pm10_data.learn, "InfGain"), decreasing = TRUE)
 sort(attrEval(PM10 ~ ., pm10_data.learn, "Gini"), decreasing = TRUE)
@@ -120,8 +297,178 @@ sort(attrEval(PM10 ~ ., pm10_data.learn, "ReliefFequalK"), decreasing = TRUE)
 sort(attrEval(PM10 ~ ., pm10_data.learn, "Relief"), decreasing = TRUE)
 sort(attrEval(PM10 ~ ., pm10_data.learn, "ReliefFexpRank"), decreasing = TRUE)
 
+observed <- pm10_data.validation$PM10
+obsMat <- model.matrix(~PM10-1, pm10_data.validation)
+mypredict.generic <- function(object, newdata){predict(object, newdata, type = "class")}
+mymodel.coremodel <- function(formula, data, target.model){CoreModel(formula, data, model=target.model)}
+mypredict.coremodel <- function(object, newdata) {pred <- predict(object, newdata)$class; destroyModels(object); pred}
 #
-### DISCRETIZATION MODELS
+#
+# DECISION TREES
+#
+#
+# fit a model using the "rpart" library
+dt <- rpart(PM10 ~ ., data = pm10_data.learning)
+#plot(dt);text(dt)
+predicted <- predict(dt, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(dt, pm10_data.validation, type = "prob")
+brier.score(obsMat, predMat)
+errorest(PM10~., data=pm10_data.learning, model = rpart, predict = mypredict.generic)
+decision_tree = c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "CORElearn" library
+cm.dt <- CoreModel(PM10 ~ ., data = pm10_data.learning, model="tree")
+plot(cm.dt, pm10_data.learning)
+predicted <- predict(cm.dt, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.dt, pm10_data.validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(PM10~., data=pm10_data.learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="tree")
+decision_tree = c(decision_tree, CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# NAIVE BAYES CLASSIFIER
+#
+#
+# fit a model using the "e1071" library
+nb <- naiveBayes(PM10 ~ ., data = pm10_data.learning, laplace = 3)
+predicted <- predict(nb, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(nb, pm10_data.validation, type = "raw")
+brier.score(obsMat, predMat)
+errorest(PM10~., data=pm10_data.learning, model = naiveBayes, predict = mypredict.generic)
+naive_bayes=c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "CORElearn" library
+cm.nb <- CoreModel(PM10 ~ ., data = pm10_data.learning, model="bayes")
+predicted <- predict(cm.nb, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.nb, pm10_data.validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(PM10~., data=pm10_data.learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="bayes")
+naive_bayes=c(naive_bayes, CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# KNN
+#
+#
+# fit a model using the "CORElearn" library
+cm.knn <- CoreModel(PM10 ~ ., data = pm10_data.learning, model="knn", kInNN = 20)
+predicted <- predict(cm.knn, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.knn, pm10_data.validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(PM10~., data=pm10_data.learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="knn")
+knn_model=c(CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# SVM
+#
+#
+# fit a model using the "e1071" library
+sm <- svm(PM10 ~ ., data = pm10_data.learning, gamma = 0.1)
+predicted <- predict(sm, pm10_data.validation, type="class")
+CA(observed, predicted)
+sm <- svm(PM10 ~ ., pm10_data.learning, probability = T)
+pred <- predict(sm, pm10_data.validation, probability = T)
+predMat <- attr(pred, "probabilities")
+brier.score(obsMat, predMat) # in this particular case, the columns of predMat are in reverse order, so we need to invert them
+errorest(PM10~., data=pm10_data.learning, model = svm, predict = mypredict.generic)
+svm_model=c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "kernlab" library
+model.svm <- ksvm(PM10 ~ ., data = pm10_data.learning, kernel = "rbfdot")
+predicted <- predict(model.svm, pm10_data.validation, type = "response")
+CA(observed, predicted)
+model.svm <- ksvm(PM10 ~ ., data = pm10_data.learning, kernel = "rbfdot", prob.model = T)
+predMat <- predict(model.svm, pm10_data.validation, type = "prob")
+brier.score(obsMat, predMat)
+mypredict.ksvm <- function(object, newdata){predict(object, newdata, type = "response")}
+errorest(PM10~., data=pm10_data.learning, model = ksvm, predict = mypredict.ksvm)
+svm_model=c(svm_model, CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# NEURAL NETWORKS
+#
+#
+# fit a model using the "nnet" library
+scale.data <- function(data) # the algorithm is more robust when scaled data is used
+{
+  norm.data <- data
+  
+  for (i in 1:ncol(data))
+  {
+    if (!is.factor(data[,i]))
+      norm.data[,i] <- scale(data[,i])
+  }
+  
+  norm.data
+}
+norm.data <- scale.data(rbind(pm10_data.learning,pm10_data.validation))
+norm.learn <- norm.data[1:nrow(pm10_data.learning),]
+norm.test <- norm.data[-(1:nrow(pm10_data.learning)),]
+set.seed(1000)
+nn <- nnet(PM10 ~ ., data = norm.learn, size = 5,rang = 0.01, decay = 0.0000001, maxit = 10000000)
+predicted <- predict(nn, norm.test, type = "class")
+CA(observed, predicted)
+predMat <- predict(nn, norm.test, type = "raw")
+brier.score(obsMat, predMat)
+mypredict.nnet <- function(object, newdata){as.factor(predict(object, newdata, type = "class"))}
+errorest(PM10~., data=norm.learn, model = nnet, predict = mypredict.nnet, size = 5, decay = 0.0001, maxit = 10000)
+neural_network=c(CA(observed, predicted), brier.score(obsMat, predMat))
+#
+#
+# RANDOM FOREST
+#
+#
+# fit a model using the "randomForest" library
+rf <- randomForest(PM10 ~ ., data = pm10_data.learning)
+predicted <- predict(rf, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(rf, pm10_data.validation, type = "prob")
+brier.score(obsMat, predMat)
+mypredict.rf <- function(object, newdata){predict(object, newdata, type = "class")}
+errorest(PM10~., data=pm10_data.learning, model = randomForest, predict = mypredict.generic)
+random_forest_model=c(CA(observed, predicted), brier.score(obsMat, predMat))
+# fit a model using the "CORElearn" library
+cm.rf <- CoreModel(PM10 ~ ., data = pm10_data.learning, model="rf")
+predicted <- predict(cm.rf, pm10_data.validation, type="class")
+CA(observed, predicted)
+predMat <- predict(cm.rf, pm10_data.validation, type = "probability")
+brier.score(obsMat, predMat)
+errorest(PM10~., data=pm10_data.learning, model = mymodel.coremodel, predict = mypredict.coremodel, target.model="rf")
+random_forest_model=c(random_forest_model, CA(observed, predicted), brier.score(obsMat, predMat))
+PM_10_clas_res<-data.frame(decision_tree, naive_bayes, knn_model, svm_model, neural_network, random_forest_model)
+
+
+
+observed <- o3_data.test$O3_max
+obsMat <- model.matrix(~O3_max-1, o3_data.test)
+model.svm <- ksvm(O3_max ~ ., data = o3_data.learn, kernel = "rbfdot")
+predicted <- predict(model.svm, o3_data.test, type = "response")
+CA(observed, predicted)
+model.svm <- ksvm(O3_max ~ ., data = o3_data.learn, kernel = "rbfdot", prob.model = T)
+predMat <- predict(model.svm, o3_data.test, type = "prob")
+brier.score(obsMat, predMat)
+mypredict.ksvm <- function(object, newdata){predict(object, newdata, type = "response")}
+errorest(O3_max~., data=o3_data.learn, model = ksvm, predict = mypredict.ksvm)
+svm_model=c(svm_model, CA(observed, predicted), brier.score(obsMat, predMat))
+res_class_o3<-c(CA(observed, predicted), brier.score(obsMat, predMat))
+
+
+observed <- pm10_data.test$PM10
+obsMat <- model.matrix(~PM10-1, pm10_data.test)
+model.svm <- ksvm(PM10 ~ ., data = pm10_data.learn, kernel = "rbfdot")
+predicted <- predict(model.svm, pm10_data.test, type = "response")
+CA(observed, predicted)
+model.svm <- ksvm(PM10 ~ ., data = pm10_data.learn, kernel = "rbfdot", prob.model = T)
+predMat <- predict(model.svm, pm10_data.test, type = "prob")
+brier.score(obsMat, predMat)
+mypredict.ksvm <- function(object, newdata){predict(object, newdata, type = "response")}
+errorest(PM10~., data=pm10_data.learn, model = ksvm, predict = mypredict.ksvm)
+svm_model=c(svm_model, CA(observed, predicted), brier.score(obsMat, predMat))
+res_class_PM10<-c(CA(observed, predicted), brier.score(obsMat, predMat))
+
+#
+### REGRESSION MODELS
 #
 
 #
