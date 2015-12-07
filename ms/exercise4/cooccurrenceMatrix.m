@@ -19,8 +19,8 @@ w = size(I,2) ;
 % extract the shifted 
 x_s = (w+1:2*w) + d(1);
 y_s = (h+1:2*h) + d(2);
-Is = In(y_s, x_s) ;
-
+Is = In(y_s, x_s)
+I
 % calculate the coocurance matrix
 C = zeros(nlevels,nlevels) ;
 for val_vert = 1 : size(C,1)
