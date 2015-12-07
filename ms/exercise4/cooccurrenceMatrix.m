@@ -29,6 +29,7 @@ for val_vert = 1 : size(C,1)
         C(val_vert, val_hor) = num_occ ;        
     end
 end
+C
 C = C / sum(C(:)) ;
 
 if nargout < 2
