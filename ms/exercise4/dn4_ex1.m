@@ -32,3 +32,4 @@ subplot(2,3,6); imagesc(Ca_img3); axis equal; axis tight;
 figure(3); plot3(dot_img1(1),dot_img1(2), dot_img1(3), 'rx'); grid on; hold on;
 plot3(dot_img2(1),dot_img2(2), dot_img2(3), 'rx');
 plot3(dot_img3(1),dot_img3(2), dot_img3(3), 'rx'); hold off;
+
