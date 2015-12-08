@@ -19,17 +19,15 @@ w = size(I,2) ;
 % extract the shifted 
 x_s = (w+1:2*w) + d(1);
 y_s = (h+1:2*h) + d(2);
-Is = In(y_s, x_s)
-I
+Is = In(y_s, x_s);
 % calculate the coocurance matrix
 C = zeros(nlevels,nlevels) ;
 for val_vert = 1 : size(C,1)
     for val_hor = 1 : size(C,2)
-        num_occ = sum(((I(:) == (val_vert-1)) .* (Is(:) == (val_hor-1)))) ;
-        C(val_vert, val_hor) = num_occ ;        
+        num_occ = sum(((I(:) == (val_vert-1)) .* (Is(:) == (val_hor-1))));
+        C(val_vert, val_hor) = num_occ;
     end
 end
-C
 C = C / sum(C(:)) ;
 
 if nargout < 2
