@@ -1,4 +1,5 @@
-% addpath('grabcut');
+addpath('grabcut');
+
 % P = rand(100,100,2); % initializesomerandomdata
 % P(:,:,2) = 1 - P(:,:,1);
 % cost = (ones(2) - eye(2))*10; % define cost(experiment with scaling)
@@ -8,6 +9,6 @@
 % S = L ~= 0;
 
 img = imread('fish.jpg');
-M = 0;
-size(img)
-grab_cut(img, M);
+% figure(1); clf; imagesc(img);
+% mask = roipoly();
+grab_cut(img, mask);
