@@ -1,4 +1,4 @@
-img_name = 'zebra.jpg';
+img_name = 'snake.jpg';
 img = rgb2gray(imread(img_name));
 R = 20;
 reduce = reduceLevels(img, 10);

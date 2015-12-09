@@ -8,7 +8,11 @@ addpath('grabcut');
 % gch = GraphCut('close', gch);% release memory
 % S = L ~= 0;
 
-img = imread('fish.jpg');
+img = imread('parrot2.jpg');
 % figure(1); clf; imagesc(img);
 % mask = roipoly();
-grab_cut(img, mask);
+res = grab_cut(img, mask, 20);
+
+figure(2); colormap gray;
+% imagesc(res);
+imagesc(immask(img, res));
