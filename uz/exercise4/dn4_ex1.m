@@ -1,5 +1,5 @@
 img = rgb2gray(imread('graf/graf1.png'));
-%(a) Hessian detector -- not working (still)
+%(a) Hessian detector
 tsh = 100;
 [px, py] = hessian_points(img, 1, tsh);
 figure(1);clf; colormap gray;
