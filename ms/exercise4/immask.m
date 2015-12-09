@@ -4,12 +4,12 @@ function [I] = immask(I, M)
         G = I(:,:,2);
         B = I(:,:,3);
 
-        R(~M) = 0;
-        G(~M) = 0;
-        B(~M) = 0;
+        R = uint8(double(R) .* M);
+        G = uint8(double(G) .* M);
+        B = uint8(double(B) .* M);
 
         I = cat(3, R, G, B);
     else
-        I(~M) = 0;
+        I = uint8(double(I) .* M);
     end;
 end

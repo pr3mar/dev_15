@@ -1,9 +1,11 @@
-img = rgb2gray(imread('fish.jpg'));
-R = 10;
+img_name = 'zebra.jpg';
+img = rgb2gray(imread(img_name));
+R = 20;
 reduce = reduceLevels(img, 10);
 patches = toPatches(reduce, R);
 
-d = [5 5];
+% d = [1 0]; %fish
+d = [-1 2];
 features = zeros(size(patches,3),4);
 for i = 1:size(patches,3)
     [~,features(i,:)] = getDot(patches(:,:,i), d);
@@ -27,22 +29,38 @@ features = [features(:,2), features(:,4)];
 % plot3(features((idx == 2),1), features((idx == 2),2), features((idx == 2),3), 'b.');
 % plot3(C(:,1), C(:,2), C(:,3), 'gX', 'MarkerSize',20, 'LineWidth',3); hold off;
 
-label = reshape(idx, R, R);
-[a, b] = hist(idx, unique(idx))
+label = reshape(idx, R, R)';
+[a, b] = hist(idx, unique(idx));
 if a(1) > a(2)
     label = label == b(2);
 else
     label = label == b(1);
 end
 
-figure(6); imagesc(label);
-label = bwlabel(label);
-[a, b] = hist(idx, unique(label));
-[~, idx] = max(a);
-label = label == b(idx);
-label = imgaussfilt(double(label));
-mask = imresize(label, [size(img,1), size(img,2)], 'bilinear');
-masked = immask(img, mask);
-imagesc(masked); colormap gray;
+figure(6);
+[label, num] = bwlabel(label);
+imagesc(label);
+% currCount = zeros(num,1);
+mask = zeros(size(label));
+% tsh = 10; %zebra
+% tsh = 50; %tiger
+% tsh = 10; % leopard
+tsh = 10; %snake
 
+for i = 1:num
+    tmp = sum(label(:) == i)
+    if (tmp > tsh)
+        mask = or(mask, (label == i));
+    end
+end
+% [~, idx] = sort(currCount,'descend');
 
+% label = label == idx(1);%or((label == idx(1)) , (label == idx(2)))
+mask = imgaussfilt(double(mask));
+mask = imresize(mask, [size(img,1), size(img,2)], 'bilinear');
+masked = immask(imread(img_name), mask);
+% masked = immask(img, mask);
+figure(7); colormap gray;
+% imagesc(label);
+
+imagesc(masked);

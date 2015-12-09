@@ -5,9 +5,9 @@ function [ corr ] = correlation( A )
     muy = (1:numel(py)) * py;
     sigmax = sqrt(sum( ((1:numel(px)) - mux).^2' .* px));
     sigmay = sqrt(sum( ((1:numel(py)) - muy).^2' .* py));
-    if sigmax == 0 || sigmay == 0
-        sigmax, sigmay
-    end
+%     if sigmax == 0 || sigmay == 0
+%         sigmax, sigmay
+%     end
     corr = 0;
     for i = 1:size(A,1)
         for j = 1:size(A,2)
@@ -15,7 +15,7 @@ function [ corr ] = correlation( A )
         end
     end
     if isnan(corr)
-        corr
+        corr = 0;
     end
 end
 
