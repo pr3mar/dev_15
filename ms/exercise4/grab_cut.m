@@ -2,14 +2,12 @@ function [ out ] = grab_cut( I, mask, iters, alfa, sigma )
     clc
     [h, w, c] = size(I);
     img = reshape(I, h * w, c);
-    foreground = zeros(h*w, c);
-    back = zeros(h*w, c);
+%      foreground = zeros(sum(mask(:)), c);
+%      back = zeros(sum(numel(mask) - mask(:)), c);
     for i = 1:iters
         mask = reshape(mask, h*w, 1);
-        for j = 1:c
-            foreground(:,j) = double(img(:,j)) .* double(mask);
-            back(:,j) = double(img(:,j)) .* double(~mask);
-        end
+        back = double(img(~mask,:));
+        foreground = double(img(mask,:));
         
         mean_f = mean(double(foreground)); cov_f = cov(double(foreground));
         mean_b = mean(double(back)); cov_b = cov(double(back));
