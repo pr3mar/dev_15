@@ -9,8 +9,8 @@ end
 
 dists = zeros(size(video,4), 1);
 
-for i = 1:2 % (frames - 1)
-    distance(histograms(:,:,i), histograms(:,:,i + 1), 'chi2')
+for i = 1:(frames - 1)
+    dists(i) = distance(histograms(:,:,i), histograms(:,:,i + 1), 'chi2');
 end
 
-imhist(dists);
+plot(dists);
