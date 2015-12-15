@@ -1,20 +1,16 @@
-video = read_video('bigbuck');
+% video = read_video('bigbuck');
+[h, w, c, frames] = size(video);
 % view the video
-vf = figure(1);
-for i = 1:frames
-    set(0, 'CurrentFigure', vf);
-    imshow(video(:,:,:,i));
-    pause(0.005);
-end
+% vf = figure(1);
+% for i = 1:frames
+%     set(0, 'CurrentFigure', vf);
+%     imshow(video(:,:,:,i));
+%     pause(0.005);
+% end
 
 bins = 8;
-% [h, w, c, frames] = size(video);
-histograms = zeros(bins, (3*size(video,2)), size(video,4));
-% size(histograms)
-for i = 1:frames
-    histograms(:,:,i) = generate_histograms(video(:,:,:,i), bins);
-end
 
+histograms = generate_histograms(video, bins);
 dists = zeros(size(video,4), 1);
 dist_type = 'hellinger';
 for i = 1:(frames - 1)
