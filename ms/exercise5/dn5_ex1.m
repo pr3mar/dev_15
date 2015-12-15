@@ -1,6 +1,6 @@
 % video = read_video('bigbuck');
 [h, w, c, frames] = size(video);
-% view the video
+% % view the video
 % vf = figure(1);
 % for i = 1:frames
 %     set(0, 'CurrentFigure', vf);
