@@ -1,13 +1,13 @@
 video = read_video('sintel');
 [h, w, c, frames] = size(video);
-bins = 8;
-hsv_video = video_to_hsv(video);
-histograms = generate_histograms(hsv_video, bins);
-dist_type = 'chi2';
-dist_mat = dist_matrix(histograms, dist_type);
-figure(1); clf; imagesc(dist_mat); title(dist_type); colormap jet;
+% bins = 8;
+% hsv_video = video_to_hsv(video);
+% histograms = generate_histograms(hsv_video, bins);
+% dist_type = 'chi2';
+% dist_mat = dist_matrix(histograms, dist_type);
+% figure(1); clf; imagesc(dist_mat); title(dist_type); colormap jet;
 
-clusters = apcluster(dist_mat, min(dist_mat(:)));
+clusters = apcluster((-dist_mat), (min(-dist_mat(:)) * 10));
 
 uni = unique(clusters);
 n_uni = numel(uni);

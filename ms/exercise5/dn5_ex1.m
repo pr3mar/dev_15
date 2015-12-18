@@ -1,4 +1,4 @@
-% video = read_video('bigbuck');
+video = read_video('bigbuck');
 [h, w, c, frames] = size(video);
 % % view the video
 % vf = figure(1);
