@@ -93,7 +93,7 @@ filled.contour(x1, x2, arrayPoints, color.palette = jet.colors)
 # Optimize this function with the monitoring of the space searched at each GA iteration
 
 myFitnes2 <- function(x)
-{
+{ 
 	-f2(x[1],x[2])
 }
 
