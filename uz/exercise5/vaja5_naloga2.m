@@ -1,6 +1,6 @@
 
 figure(1) ; clf ;
-f_nm = 'house' ;
+f_nm = 'epipolar/house' ;
 fname1 = [f_nm,'1.jpg'] ;
 fname2 = [f_nm,'2.jpg'] ;
 fname_points = 'test_tocke.txt' ;
@@ -16,7 +16,7 @@ subplot(1,2,2) ; imagesc(a_r) ; axis equal ; axis tight ; hold on ;
 title('Right camera') ;
 
 % load data 
-pts = load('house_matches.txt') ; 
+pts = load('epipolar/house_matches.txt') ; 
 
 pts_l = pts(:,1:2)' ;
 pts_r = pts(:,3:4)' ;
