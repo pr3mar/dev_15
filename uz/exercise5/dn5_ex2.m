@@ -21,6 +21,6 @@ pts = load('epipolar/house_matches.txt') ;
 pts_l = pts(:,1:2)' ;
 pts_r = pts(:,3:4)' ;
 
-figure(2); clf ;
-displaymatches(a_l, pts_l(1,:), pts_l(2,:), a_r, pts_r(1,:), pts_r(2,:), []) ;
+% figure(2); clf ;
+% displaymatches(a_l, pts_l(1,:), pts_l(2,:), a_r, pts_r(1,:), pts_r(2,:), []) ;
  
