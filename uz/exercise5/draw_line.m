@@ -13,5 +13,4 @@ else
     y1 = (-l(3)-l(1)*x1)/l(2) ;
     y2 = (-l(3)-l(1)*x2)/l(2) ;
 end
-
 plot([x1, x2], [y1, y2], color) ;

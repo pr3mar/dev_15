@@ -1,28 +1,40 @@
-f_nm = 'epipolar/house' ;
-fname1 = [f_nm,'1.jpg'] ;
-fname2 = [f_nm,'2.jpg'] ;
-fname_points = 'test_tocke.txt' ;
+dir = 'epipolar';
+f_left = 'house1.jpg';
+f_right = 'house2.jpg';
+pic_left = imread(fullfile(dir, f_left));
+[hl, wl, ~] = size(pic_left);
+pic_right = imread(fullfile(dir, f_right));
+[hr, wr, ~] = size(pic_right);
 
-% load images
-a_l = imread(fname1) ;
-a_r = imread(fname2) ;
+house_dots = load(fullfile(dir, 'house_points.txt'));
+dots_left = house_dots(:,1:2)';
+dots_right = house_dots(:, 3:4)';
 
-% display images
-% figure(1) ; clf ;
-% subplot(1,2,1) ; imagesc(a_l) ; axis equal ; axis tight ; hold on ;
-% title('Left camera') ;
-% subplot(1,2,2) ; imagesc(a_r) ; axis equal ; axis tight ; hold on ;
-% title('Right camera') ;
+test_left = [85 233 1]';
+test_right = [67 219 1]';
 
-% load data 
-pts = load('epipolar/house_matches.txt') ; 
+f_loaded = load(fullfile(dir, 'house_fundamental.txt'));
+l2_loaded = f_loaded * test_left;
+l1_loaded = f_loaded' * test_right;
 
-pts_l = pts(:,1:2) ;
-pts_r = pts(:,3:4) ;
+f = fundamental_matrix(dots_left, dots_right);
+l2 = f * test_left;
+l1 = f' * test_right;
 
-[e1, e2, F] = fundamental_matrix(pts_l, pts_r);
+figure(1); clf;
+% left image
+subplot(1,2,1); imagesc(pic_left); axis equal; axis tight; hold on;
+plot(dots_left(1,:), dots_left(2,:), 'rx');
+plot(test_left(1), test_left(2), 'go');
+draw_line(l1_loaded, wl, hl, 'b');
+draw_line(l1, wl, hl, 'g');
 
+% right image
+subplot(1,2,2); imagesc(pic_right); axis equal; axis tight; hold on;
+plot(dots_right(1,:), dots_right(2,:), 'rx');
+plot(test_right(1), test_right(2), 'go');
+draw_line(-l2_loaded, wr, hr, 'b');
+draw_line(-l2, wr, hr, 'g');
 
-
-% figure(2); clf ;
-% displaymatches(a_l, pts_l(1,:), pts_l(2,:), a_r, pts_r(1,:), pts_r(2,:), []) ;
+reprojection_error(test_left, test_right, f_loaded)
+reprojection_error(test_left, test_right, f)
