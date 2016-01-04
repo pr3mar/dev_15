@@ -18,8 +18,8 @@ l2_loaded = f_loaded * test_left;
 l1_loaded = f_loaded' * test_right;
 
 f = fundamental_matrix(dots_left, dots_right);
-l2 = f * test_left;
-l1 = f' * test_right;
+l2 = f' * test_left;
+l1 = f * test_right;
 
 figure(1); clf;
 % left image
@@ -27,14 +27,14 @@ subplot(1,2,1); imagesc(pic_left); axis equal; axis tight; hold on;
 plot(dots_left(1,:), dots_left(2,:), 'rx');
 plot(test_left(1), test_left(2), 'go');
 draw_line(l1_loaded, wl, hl, 'b');
-draw_line(l1, wl, hl, 'g');
+draw_line(-l1, wl, hl, 'g');
 
 % right image
 subplot(1,2,2); imagesc(pic_right); axis equal; axis tight; hold on;
 plot(dots_right(1,:), dots_right(2,:), 'rx');
 plot(test_right(1), test_right(2), 'go');
 draw_line(-l2_loaded, wr, hr, 'b');
-draw_line(-l2, wr, hr, 'g');
+draw_line(l2, wr, hr, 'g');
 
 reprojection_error(test_left, test_right, f_loaded)
-reprojection_error(test_left, test_right, f)
+reprojection_error(test_right, test_left, f)
