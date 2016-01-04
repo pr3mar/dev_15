@@ -305,7 +305,7 @@ library(openNLP)
 
 
 s <- "Steven Allan Spielberg is an American filmmaker and business magnate. Spielberg is consistently considered as one of the leading pioneers of the New Hollywood era, as well as being viewed as one of the most popular and influential filmmakers in the history of cinema."
-s <- as.String(s)
+s <- as.String(s) # interna predstavitev, iz NLP knjiznice.
 
 # Generate an annotator which computes sentence annotations 
 sent_ann <- Maxent_Sent_Token_Annotator()
