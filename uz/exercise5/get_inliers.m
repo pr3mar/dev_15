@@ -1,10 +1,12 @@
 function [ x1in, x2in ] = get_inliers( F, x1, x2, eps)
     [~, length] = size(x1);
-    vals = zeros(length, 1);
+    indices = false(length, 1);
     for i = 1:length
-%         vals =  what do?
+        [~, d1, d2] = reprojection_error(x1(:,i), x2(:,i), F);
+        if (d1 < eps) && (d2 < eps)
+            indices(i) = true;
+        end
     end
-    inliers = vals < eps;
-    x1in = x1(:, inliers);
-    x2in = x2(:, inliers);
+    x1in = x1(:, indices);
+    x2in = x2(:, indices);
 end
