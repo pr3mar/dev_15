@@ -5,7 +5,6 @@ function [ MF, me1, me2, maxX1, maxX2 ] = ransac_fundamental( x1, x2, eps, k)
     for i = 1:k
         rnd = randperm(length, 8);
         [F, e1, e2] = fundamental_matrix( x1(:,rnd), x2(:,rnd));
-        
         [x1in, x2in] = get_inliers(F, x1, x2, eps);
         [~, inLen] = size(x1in);
         if(inLen > maxInliers)
