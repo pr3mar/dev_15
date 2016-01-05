@@ -41,4 +41,4 @@ plot(matches_right(1,:), matches_right(2,:), 'rx');
 plot(x2(1,:), x2(2,:), 'bx');
 plot(x2(1,line_index), x2(2,line_index), 'go');
 draw_line(-l1, w, h, 'g');
-title(sprintf('inliers= %.2f %%\n error = %.2f', inliers, reprojection_error(x1(:,line_index), x2(:,line_index),F)));
+title(sprintf('inliers= %.2f %%\n error = %.2f', (inliers * 100), reprojection_error(x1(:,line_index), x2(:,line_index),F)));

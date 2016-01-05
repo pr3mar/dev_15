@@ -1,34 +1,34 @@
 % (a, b)
 %new york
-img1 = imread('newyork/newyork1.png');
-img2 = imread('newyork/newyork2.png');
-points = csvread('newyork/newyork.txt');
-px1 = points(1,:); py1 = points(2,:);
-px2 = points(3,:); py2 = points(4,:);
-
-H = estimate_homography(px1, py1, px2, py2);
-transformed = transform_homography(img1, H);
-
-figure(1); colormap gray; 
-subplot(1,3,1); imagesc(img1); axis equal; axis tight;
-subplot(1,3,2); imagesc(img2); axis equal; axis tight;
-subplot(1,3,3); imagesc(transformed); axis equal; axis tight;
-
-% graffiti
-img1 = rgb2gray(imread('graf/graf1.png'));
-img2 = rgb2gray(imread('graf/graf2.png'));
-points = csvread('graf/graf.txt')';
-px1 = points(1,:); py1 = points(2,:);
-px2 = points(3,:); py2 = points(4,:);
-H_2 = estimate_homography(px1, py1, px2, py2);
-transformed_2 = transform_homography(img1, H_2);
-
-figure(2); colormap gray; 
-subplot(1,3,1); imagesc(img1); axis equal; axis tight; hold on;
-plot(px1, py1, 'rx'); hold off;
-subplot(1,3,2); imagesc(img2); axis equal; axis tight;
-hold on; plot(px2, py2, 'rx'); hold off;
-subplot(1,3,3); imagesc(transformed_2); axis equal; axis tight;
+% img1 = imread('newyork/newyork1.png');
+% img2 = imread('newyork/newyork2.png');
+% points = csvread('newyork/newyork.txt');
+% px1 = points(1,:); py1 = points(2,:);
+% px2 = points(3,:); py2 = points(4,:);
+% 
+% H = estimate_homography(px1, py1, px2, py2);
+% transformed = transform_homography(img1, H);
+% 
+% figure(1); colormap gray; 
+% subplot(1,3,1); imagesc(img1); axis equal; axis tight;
+% subplot(1,3,2); imagesc(img2); axis equal; axis tight;
+% subplot(1,3,3); imagesc(transformed); axis equal; axis tight;
+% 
+% % graffiti
+% img1 = rgb2gray(imread('graf/graf1.png'));
+% img2 = rgb2gray(imread('graf/graf2.png'));
+% points = csvread('graf/graf.txt')';
+% px1 = points(1,:); py1 = points(2,:);
+% px2 = points(3,:); py2 = points(4,:);
+% H_2 = estimate_homography(px1, py1, px2, py2);
+% transformed_2 = transform_homography(img1, H_2);
+% 
+% figure(2); colormap gray; 
+% subplot(1,3,1); imagesc(img1); axis equal; axis tight; hold on;
+% plot(px1, py1, 'rx'); hold off;
+% subplot(1,3,2); imagesc(img2); axis equal; axis tight;
+% hold on; plot(px2, py2, 'rx'); hold off;
+% subplot(1,3,3); imagesc(transformed_2); axis equal; axis tight;
 
 
 
