@@ -1,16 +1,16 @@
-% f = 0.025;
-% T = 12;
-% pz = 1:100;
-% d = f * T ./ pz;
+f = 0.025;
+T = 12;
+pz = 1:100;
+d = f * T ./ pz;
 % plot(d);
 
-
-F = [0 0 0.002; 0 0 -0.012; -0.001 0.011 -0.085];
-x1 = [300, 120, 1]';
-x2 = [300, 170, 1]';
-l2 = F * x1;
-l1 = F * x2;
-
-figure(1);
-draw_line(l1, 500, 500, 'g'); hold on;
-draw_line(l2, 500, 500, 'g');
+w = 648;
+h = 488;
+f = 2.5 * 10^(-3);
+T = 12 * 10^(-2);
+pw = 7.4 * 10^(-6);
+detLeft = 550;
+detRight = 300;
+d = f * T / ((detLeft - detRight) * pw)
+detRight = 540;
+d = f * T / ((detLeft - detRight) * pw)

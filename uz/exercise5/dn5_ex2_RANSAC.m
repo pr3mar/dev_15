@@ -31,7 +31,7 @@ figure(1); clf;
 subplot(1,2,1); imagesc(pic_left); axis equal; axis tight; hold on;
 plot(matches_left(1,:), matches_left(2,:), 'rx');
 plot(x1(1,:), x1(2,:), 'bx');
-plot(x1(1,line_index) x1(2,line_index), 'go');
+plot(x1(1,line_index), x1(2,line_index), 'go');
 draw_line(l2, w, h, 'g');
 title(sprintf('error(global) = %.2f', avg_error));
 
