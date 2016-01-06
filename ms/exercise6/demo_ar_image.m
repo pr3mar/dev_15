@@ -17,28 +17,28 @@ function demo_ar_image (im, K, marker_template)
     debug_figure = 1;
     debug_palette = generate_palette();
 
-    figure(2); clf;  figure(1); clf;
+    figure(2); clf;  %figure(1); clf;
     
     % Display input image
     im = double(im);
-    draw_image(im, debug_figure);
+%     draw_image(im, debug_figure);
 
     % Threshold image
     imThresh = threshold(im, thresh);
-    draw_threshold(imThresh, debug_figure);
+%     draw_threshold(imThresh, debug_figure);
 
     % Find connected regions
     [ imConn,area, x, y,l,r,t, b ] = connected_components(imThresh, areaMin);
-    draw_connected_components(imConn, debug_figure, debug_palette);
+%     draw_connected_components(imConn, debug_figure, debug_palette);
 
     % Find contours of regions
     [ imCont, YChain, XChain, chainL] = find_contours(imConn, t, r, l);
-    draw_contours(imCont, debug_figure, debug_palette);
+%     draw_contours(imCont, debug_figure, debug_palette);
 
     % Fit straight lines to contours, and intersect them to find corners
     [ XChain, YChain, chainL, vertices ] = line_segments(XChain, YChain, chainL, area, cornerThresh);
     [ allPointsX, allPointsY ] = calculate_intersection(XChain, YChain, chainL, vertices);
-    draw_corners_lines(im, allPointsX, allPointsY, debug_figure);
+%     draw_corners_lines(im, allPointsX, allPointsY, debug_figure);
 
     % We assume that the correct marker is always at the first place in the 
     % list of detected markers - this is not always correct and could be 
@@ -54,6 +54,7 @@ function demo_ar_image (im, K, marker_template)
         % Coordinates of square marker in "world coordinates"
         X_world = [ 0, 1, 1, 0 ];
         Y_world = [ 0, 0, 1, 1 ];
+        Z_world = [ 0, 0, 0, 0 ];
         
         % change the sequence of detected corners so that it matches the reference
         for i=1:size(vertex_order,1),
@@ -69,8 +70,42 @@ function demo_ar_image (im, K, marker_template)
         % variables allPointsX and allPointsY, while vertex_order contains
         % the list of coordinate order
         
-        figure(2); imshow(uint8(im)); hold on;
-
+        H = estimate_homography(X_world, Y_world, allPointsX, allPointsY);
+        
+        lambda = 1/((norm(K \ H(:,1)) + norm(K \ H(:,2)))/2); % !! maybe an error can occur.
+        
+        B = K \ H;
+        if (det(B) < 0)
+            B = B * (-1);
+        end
+        
+        B = lambda * B;
+        
+        r1 = B(:,1);
+        r2 = B(:,2);
+        r3 = cross(r1, r2);
+        R = [r1 r2 r3];
+        t = B(:,3);
+        
+        P = K * [R t];
+        
+        circle_world = [0 1 1 0  0  1  1  0; ...
+                        0 0 1 1  0  0  1  1; ...
+                        0 0 0 0 -1 -1 -1 -1; ...
+                        1 1 1 1  1  1  1  1];
+%         tmp = circle_world(1:2,:) + 0.05;
+%         circle_world(1:2,:) = tmp;
+        circ_dim = [15 15];
+        
+        figure(2); imagesc(uint8(im)); axis tight; axis equal; hold on;
+        circle_camera = P * circle_world;
+        circle_camera = bsxfun (@rdivide, circle_camera, circle_camera(end,:));
+        draw = [circle_camera(1:2, :)', repmat(circ_dim, 8, 1)];
+        
+        for i = 1:size(draw,1)
+            rectangle('Position',draw(i,:) ,'Curvature',[1 1], 'FaceColor',[0 .5 .5], 'EdgeColor',[0 .5 .5])
+        end
+        draw
         % TODO: fill in the remaining part of the code!
     else
         figure(2); clf;

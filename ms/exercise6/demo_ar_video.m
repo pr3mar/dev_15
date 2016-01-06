@@ -31,6 +31,6 @@ function demo_ar_video ()
     
         % Save image from figure 2 to disk
         figure(2); % Make figure 2 the current figure so we can save it
-        print('-djpeg', fullfile(output_images_folder, sprintf('%08d.jpg', i)));
+%         print('-djpeg', fullfile(output_images_folder, sprintf('%08d.jpg', i)));
     end
 end
