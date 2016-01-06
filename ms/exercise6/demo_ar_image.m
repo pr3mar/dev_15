@@ -11,9 +11,9 @@ function demo_ar_image (im, K, marker_template)
     %  - marker_template: marker template image, reshaped into 1-D column vector
 
     % Parameters
-    thresh = 190;                       % luminance threshold
+    thresh = 150;                       % luminance threshold
     areaMin = 1000;                     % marker must contain more contiguous black pixels than this
-    cornerThresh = 20;                  % threshold for corner detection.
+    cornerThresh = 7;                  % threshold for corner detection.
     debug_figure = 1;
     debug_palette = generate_palette();
 
@@ -21,24 +21,24 @@ function demo_ar_image (im, K, marker_template)
     
     % Display input image
     im = double(im);
-%     draw_image(im, debug_figure);
+    draw_image(im, debug_figure);
 
     % Threshold image
     imThresh = threshold(im, thresh);
-%     draw_threshold(imThresh, debug_figure);
+    draw_threshold(imThresh, debug_figure);
 
     % Find connected regions
     [ imConn,area, x, y,l,r,t, b ] = connected_components(imThresh, areaMin);
-%     draw_connected_components(imConn, debug_figure, debug_palette);
+    draw_connected_components(imConn, debug_figure, debug_palette);
 
     % Find contours of regions
     [ imCont, YChain, XChain, chainL] = find_contours(imConn, t, r, l);
-%     draw_contours(imCont, debug_figure, debug_palette);
+    draw_contours(imCont, debug_figure, debug_palette);
 
     % Fit straight lines to contours, and intersect them to find corners
     [ XChain, YChain, chainL, vertices ] = line_segments(XChain, YChain, chainL, area, cornerThresh);
     [ allPointsX, allPointsY ] = calculate_intersection(XChain, YChain, chainL, vertices);
-%     draw_corners_lines(im, allPointsX, allPointsY, debug_figure);
+    draw_corners_lines(im, allPointsX, allPointsY, debug_figure);
 
     % We assume that the correct marker is always at the first place in the 
     % list of detected markers - this is not always correct and could be 
@@ -72,7 +72,7 @@ function demo_ar_image (im, K, marker_template)
         
         H = estimate_homography(X_world, Y_world, allPointsX, allPointsY);
         
-        lambda = 1/((norm(K \ H(:,1)) + norm(K \ H(:,2)))/2); % !! maybe an error can occur.
+        lambda = 1/((norm(K \ H(:,1)) + norm(K \ H(:,2)))/2);
         
         B = K \ H;
         if (det(B) < 0)
@@ -88,11 +88,31 @@ function demo_ar_image (im, K, marker_template)
         t = B(:,3);
         
         P = K * [R t];
-        
-        circle_world = [0 1 1 0  0  1  1  0; ...
-                        0 0 1 1  0  0  1  1; ...
-                        0 0 0 0 -1 -1 -1 -1; ...
-                        1 1 1 1  1  1  1  1];
+        %               1 2 3 4  5  6  7  8 9
+        circle_world = [0 1 1 0  0  1  1  0 0; ...
+                        0 0 1 1  0  0  1  1 0; ...
+                        0 0 0 0 -0.75 -0.75 -0.75 -0.75 1; ...
+                        1 1 1 1  1  1  1  1 1];
+        circle_color = [ 0   0 0; ... % black
+                         1   1 0; ... % yellow
+                         1   0 1; ... % magenta
+                         0   1 1; ... % cyan
+                         1   0 0; ... % red
+                         1 0.5 0; ... % orange
+                         0   0 1; ... % blue
+                         1   1 1]; % white
+        line_pairs = [1 2; ...
+                      1 4; ...
+                      1 5; ...
+                      2 3; ...
+                      2 6; ...
+                      3 4; ...
+                      3 7; ...
+                      4 8; ...
+                      5 6; ...
+                      5 8; ...
+                      6 7; ...
+                      7 8];
 %         tmp = circle_world(1:2,:) + 0.05;
 %         circle_world(1:2,:) = tmp;
         circ_dim = [15 15];
@@ -100,16 +120,31 @@ function demo_ar_image (im, K, marker_template)
         figure(2); imagesc(uint8(im)); axis tight; axis equal; hold on;
         circle_camera = P * circle_world;
         circle_camera = bsxfun (@rdivide, circle_camera, circle_camera(end,:));
-        draw = [circle_camera(1:2, :)', repmat(circ_dim, 8, 1)];
+        draw = [circle_camera(1:2, 1:(end -1))', repmat(circ_dim, 8, 1)];
         
-        for i = 1:size(draw,1)
-            rectangle('Position',draw(i,:) ,'Curvature',[1 1], 'FaceColor',[0 .5 .5], 'EdgeColor',[0 .5 .5])
+        for i = 1:size(line_pairs,1)
+            index1 = line_pairs(i,1);
+            index2 = line_pairs(i,2);
+            x1 = circle_camera(1, index1);
+            x2 = circle_camera(1, index2);
+            y1 = circle_camera(2, index1);
+            y2 = circle_camera(2, index2);
+            
+            plot([x1, x2], [y1, y2], 'Color', [.3 .3 .3], 'LineWidth', 2);
         end
-        draw
-        % TODO: fill in the remaining part of the code!
+        
+        plot([circle_camera(1, 1), circle_camera(1, 2)], [circle_camera(2,1), circle_camera(2, 2)], 'r', 'LineWidth', 2); % x axis
+        plot([circle_camera(1, 1), circle_camera(1, 4)], [circle_camera(2,1), circle_camera(2, 4)], 'g', 'LineWidth', 2); % y axis
+        plot([circle_camera(1, 1), circle_camera(1, 9)], [circle_camera(2,1), circle_camera(2, 9)], 'b', 'LineWidth', 2); % y axis
+        
+        for i = 1:(size(draw,1))
+%             rectangle('Position',draw(i,:) ,'Curvature',[1 1], 'FaceColor',[0 .5 .5], 'EdgeColor',[0 .5 .5])
+            filledCircle(draw(i,1:2),10,500, circle_color(i,:));
+        end
+        draw;
     else
         figure(2); clf;
-        imshow(uint8(im)); hold on; axis equal; axis tight;
+        imagesc(uint8(im)); hold on; axis equal; axis tight;
     end
 
     hold off;
