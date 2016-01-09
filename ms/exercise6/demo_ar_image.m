@@ -95,7 +95,7 @@ function demo_ar_image (im, K, marker_template)
                         1 1 1 1  1  1  1  1 1];
         circle_color = [ 0   0 0; ... % black
                          1   1 0; ... % yellow
-                         1   0 1; ... % magenta
+                         0   1 0; ... % magenta
                          0   1 1; ... % cyan
                          1   0 0; ... % red
                          1 0.5 0; ... % orange
@@ -130,7 +130,7 @@ function demo_ar_image (im, K, marker_template)
             y1 = circle_camera(2, index1);
             y2 = circle_camera(2, index2);
             
-            plot([x1, x2], [y1, y2], 'Color', [.3 .3 .3], 'LineWidth', 2);
+            plot([x1, x2], [y1, y2], 'Color', [1 0 1], 'LineWidth', 2);
         end
         
         plot([circle_camera(1, 1), circle_camera(1, 2)], [circle_camera(2,1), circle_camera(2, 2)], 'r', 'LineWidth', 2); % x axis
@@ -152,7 +152,7 @@ end
 
 %-------------------------- Utility code for visualization ---------------- %
 function draw_image(im, h1)
-    figure(h1); set(gcf,'Position',[ 61   206   944   467]);
+%     figure(h1); set(gcf,'Position',[ 61   206   944   467]);
     figure (h1); subplot(2,3,1); imagesc(im/255); axis off; pause(0.01);
     title('Original Image');
 end

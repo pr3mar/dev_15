@@ -16,7 +16,7 @@ function demo_ar_video ()
     marker_template = double( marker_template(:)' );
 
     % Set output folder
-    output_images_folder = '/tmp/'; % Save output images here
+    output_images_folder = 'tmp'; % Save output images here
 
     % Read vide and process all frames
     video_file = 'test_video.avi';
@@ -25,12 +25,12 @@ function demo_ar_video ()
     frames = video.read();
     nFrames = size(frames, 4);
 
-    for i = 1:nFrames,
+    for i = 432:nFrames,
         % Process a single image
         demo_ar_image(frames(:, :, :, i), K, marker_template);
     
         % Save image from figure 2 to disk
         figure(2); % Make figure 2 the current figure so we can save it
-%         print('-djpeg', fullfile(output_images_folder, sprintf('%08d.jpg', i)));
+        print('-djpeg', fullfile(output_images_folder, sprintf('%08d.jpg', i)));
     end
 end
