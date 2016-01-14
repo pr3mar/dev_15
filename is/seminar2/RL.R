@@ -13,6 +13,40 @@ getStateDesc <- function(sceneObjects)
 	if (rightedge - sceneObjects[1,"xbottomright"] < 2)
 		state["right"] <- 2
 
+	sel <- which(sceneObjects$type == "fuel")
+	for (i in sel)
+	{
+		if (isOverlapped(sceneObjects[1, "xtopleft"], 
+                             sceneObjects[1, "ytopleft"] + CARLENGTH,
+                             sceneObjects[1, "xbottomright"],
+                             sceneObjects[1, "ytopleft"],
+                             sceneObjects[i, "xtopleft"], 
+                             sceneObjects[i, "ytopleft"],
+                             sceneObjects[i, "xbottomright"],
+                             sceneObjects[i, "ybottomright"]))
+			state["front"] <- 3
+
+		if (isOverlapped(sceneObjects[1, "xtopleft"] - CARWIDTH, 
+                             sceneObjects[1, "ytopleft"],
+                             sceneObjects[1, "xtopleft"],
+                             sceneObjects[1, "ybottomright"],
+                             sceneObjects[i, "xtopleft"], 
+                             sceneObjects[i, "ytopleft"],
+                             sceneObjects[i, "xbottomright"],
+                             sceneObjects[i, "ybottomright"]))
+			state["left"] <- 3
+
+		if (isOverlapped(sceneObjects[1, "xbottomright"], 
+                             sceneObjects[1, "ytopleft"],
+                             sceneObjects[1, "xbottomright"] + CARWIDTH,
+                             sceneObjects[1, "ybottomright"],
+                             sceneObjects[i, "xtopleft"], 
+                             sceneObjects[i, "ytopleft"],
+                             sceneObjects[i, "xbottomright"],
+                             sceneObjects[i, "ybottomright"]))
+			state["right"] <- 3
+	}
+	
 	sel <- which(sceneObjects$type == "car")
 	for (i in sel)
 	{
@@ -46,7 +80,7 @@ getStateDesc <- function(sceneObjects)
                              sceneObjects[i, "ybottomright"]))
 			state["right"] <- 2
 	}
-
+	
 	state
 }
 
@@ -57,13 +91,63 @@ getReward <- function(state, action, hitObjects)
 	# action 3 - steer right
 	# action 4 - speed up
 	# action 5 - speed down
-
-	reward <- 1
-
-	reward	
+	reward <- -1
+	if(action==2) {				#steer left
+		if(state['left'] == 2) {
+			reward <- (-100)
+		} else if(state['left']==3) {
+			reward <- 100
+		} else {
+			reward <- -1
+		}
+	}
+	
+	if(action==3) {				#steer right
+		if(state['right']==2) {
+			reward <- (-100)
+		} else if(state['right']==3) {
+			reward <- 100
+		} else {
+			reward <- -1
+		}
+	}
+	
+	if(action==3) {				#nothing
+		#if (state['front'] == 2 && state['left'] == 2 && state['right'] == 2) {
+		#	reward <- 100
+		#} else if ((state['front'] == 2 && state['left'] == 1 && state['right'] == 1) 
+		#		|| (state['front'] == 1 && state['left'] == 2 && state['right'] == 1) 
+		#			|| (state['front'] == 1 && state['left'] == 1 && state['right'] == 2)){
+		#	reward <-  -150
+		#} else {
+		#	reward <-  -100
+		#}
+		if (state['front'] == 2){
+			reward <- (-50)
+		} else {
+			reward <- (-100)
+		}
+	} else if(action==4) {		#speed up
+		if(state['front'] == 2) {
+			reward <-  (-150)
+		} else if(state['front'] == 3) {
+			reward <-  100
+		} else {
+			reward <-  100
+		}
+	} else if(action==5) {		#speed down
+		if(state['front']==2 && state['left']==2 && state['right']==2) {
+			reward <-  100
+		} else if ((state['front']==2 && state['left']==1 && state['right']==1)	
+					|| (state['front']==1 && state['left']==2 && state['right']==2)
+						|| (state['front']==1 && state['left']==1 && state['right']==2)){
+			reward <-  (50)
+		} else {
+			reward <- (-50)
+		}
+	}
+	# cat(reward, '\n')
+	reward
 }
 
 
-initConsts(numlanes=3, numcars=5)
-qmat <- qlearning(c(2, 2, 2))
-simulation(qmat)

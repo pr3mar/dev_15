@@ -1,0 +1,5 @@
+setwd("D:\\dev\\dev_15\\is\\seminar2")
+initConsts(numlanes=3, numcars=5)
+source("RL.R")
+qmat <- qlearning(c(3, 3, 3), maxtrial=50)
+simulation(qmat)
