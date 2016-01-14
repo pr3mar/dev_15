@@ -31,12 +31,12 @@ function direct_pca_demo()
     plot([mu(1), vec2(1)], [mu(2), vec2(2)], 'r');
     
     % (d)
+    proj = U' * bsxfun(@minus, P, mu);
+    proj_back = bsxfun(@plus, U * proj, mu);
     Up = U; Up(:,2) = 0;
-    Pp = bsxfun(@plus, Up' * Pn, mu);
+    proj_back_1 = bsxfun(@plus, Up * proj, mu);
     
-    plot(Pp(1,:), Pp(2,:), 'o');
-    
-    draw_reconstructions(P, Pp);
+    draw_reconstructions(proj_back, proj_back_1);
     % projected onto a line
     
     % (e)

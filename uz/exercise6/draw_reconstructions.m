@@ -5,4 +5,4 @@ for i = 1 : size(P_orig,2)
 end
 
 plot(P_orig(1,:), P_orig(2,:),'.r') ;
-plot(P_rec(1,:), P_rec(2,:),'.g') ;
+plot(P_rec(1,:), P_rec(2,:),'.m') ;
