@@ -8,9 +8,9 @@ getStateDesc <- function(sceneObjects)
 	leftedge <- sceneObjects[which(sceneObjects$type == "leftside"), "xtopleft"]
 	rightedge <- sceneObjects[which(sceneObjects$type == "rightside"), "xbottomright"]
 
-	if (abs(leftedge) < 2)
+	if (abs(leftedge) < 5)
 		state["left"] <- 2
-	if (rightedge - sceneObjects[1,"xbottomright"] < 2)
+	if (rightedge - sceneObjects[1,"xbottomright"] < 5)
 		state["right"] <- 2
 
 	sel <- which(sceneObjects$type == "fuel")
@@ -92,61 +92,60 @@ getReward <- function(state, action, hitObjects)
 	# action 4 - speed up
 	# action 5 - speed down
 	reward <- -1
-	if(action==2) {				#steer left
+	
+	cat('action', action, ', ')
+	
+	if(action == 3) {				#steer right
+		cat('right')
+		if(state['right'] == 2) {
+			reward <- (-100)
+		} else if(state['right'] == 3) {
+			reward <- 10
+		} else {
+			reward <- -1
+		}
+	}
+	
+	if(action == 2) {				#steer left
+		cat('left')
 		if(state['left'] == 2) {
 			reward <- (-100)
-		} else if(state['left']==3) {
-			reward <- 100
+		} else if(state['left'] == 3) {
+			reward <- 10
 		} else {
 			reward <- -1
 		}
 	}
 	
-	if(action==3) {				#steer right
-		if(state['right']==2) {
+	if(action == 1) {				#nothing
+		cat('nothing')
+		if (state['front'] == 2 || state['front'] == 3){
 			reward <- (-100)
-		} else if(state['right']==3) {
-			reward <- 100
 		} else {
-			reward <- -1
+			reward <- (-1)
 		}
 	}
 	
-	if(action==3) {				#nothing
-		#if (state['front'] == 2 && state['left'] == 2 && state['right'] == 2) {
-		#	reward <- 100
-		#} else if ((state['front'] == 2 && state['left'] == 1 && state['right'] == 1) 
-		#		|| (state['front'] == 1 && state['left'] == 2 && state['right'] == 1) 
-		#			|| (state['front'] == 1 && state['left'] == 1 && state['right'] == 2)){
-		#	reward <-  -150
-		#} else {
-		#	reward <-  -100
-		#}
-		if (state['front'] == 2){
-			reward <- (-50)
-		} else {
-			reward <- (-100)
-		}
-	} else if(action==4) {		#speed up
+	if(action == 4) {				#speed up
+		cat('speed++')
 		if(state['front'] == 2) {
-			reward <-  (-150)
-		} else if(state['front'] == 3) {
-			reward <-  100
+			reward <- (-100)
+		} else if(state['left'] == 2 || state['right'] == 2) {
+			reward <- 200
 		} else {
-			reward <-  100
-		}
-	} else if(action==5) {		#speed down
-		if(state['front']==2 && state['left']==2 && state['right']==2) {
-			reward <-  100
-		} else if ((state['front']==2 && state['left']==1 && state['right']==1)	
-					|| (state['front']==1 && state['left']==2 && state['right']==2)
-						|| (state['front']==1 && state['left']==1 && state['right']==2)){
-			reward <-  (50)
-		} else {
-			reward <- (-50)
+			reward <- 10
 		}
 	}
-	# cat(reward, '\n')
+	
+	if(action == 5) {				#speed down
+		cat('speed--')
+		if(state['front'] == 2) {
+			reward <- 10
+		} else {
+			reward <- (-100)
+		}
+	}
+	cat(' ', reward, '\n')
 	reward
 }
 
