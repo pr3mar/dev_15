@@ -478,7 +478,8 @@ qlearning <- function(dimStateSpace, gamma = 0.9, maxtrials = 200, maxdistance =
 			
 			sceneObjects <- collectSceneObjects(simData)
 			nextState <- getStateDesc(sceneObjects)
-			reward <- getReward(nextState, action, simData$hitItems)
+			#reward <- getReward(nextState, action, simData$hitItems)
+			reward <- getReward(curState, nextState, action, simData$hitObjects)
 
 			curStatePos <- dim2sub(c(curState, action), dimQ)
 			len <- length(nextState)

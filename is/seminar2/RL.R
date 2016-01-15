@@ -5,6 +5,9 @@ getStateDesc <- function(sceneObjects)
 	state <- c(1, 1, 1, 1, 1)
 	names(state) <- c("left", "diagLeft", "front", "diagRight", "right")
 	
+	#state <- c(1, 1, 1)
+	#names(state) <- c("left", "front", "right")
+	
 	leftedge <- sceneObjects[which(sceneObjects$type == "leftside"), "xtopleft"]
 	rightedge <- sceneObjects[which(sceneObjects$type == "rightside"), "xbottomright"]
 
@@ -19,8 +22,8 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ytopleft"],
                             sceneObjects[i, "xbottomright"],
                             sceneObjects[i, "ybottomright"]))
-			state["front"] <- 3
-
+				state["front"] <- 3
+	
 		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH, 
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[1, "xtopleft"],
@@ -29,7 +32,7 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ytopleft"],
                             sceneObjects[i, "xbottomright"],
                             sceneObjects[i, "ybottomright"]))
-			state["left"] <- 3
+				state["left"] <- 3
 		
 		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH, 
                             sceneObjects[1, "ytopleft"] + CARLENGTH,
@@ -41,7 +44,6 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ybottomright"]))
 			state["diagLeft"] <- 3
 		
-
 		if (isOverlapped(	sceneObjects[1, "xbottomright"], 
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[1, "xbottomright"] + CARWIDTH,
@@ -92,7 +94,7 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ytopleft"],
                             sceneObjects[i, "xbottomright"],
                             sceneObjects[i, "ybottomright"]))
-			state["diagLeft"] <- 3
+			state["diagLeft"] <- 2
 
 		if (isOverlapped(	sceneObjects[1, "xbottomright"], 
                             sceneObjects[1, "ytopleft"],
@@ -111,7 +113,7 @@ getStateDesc <- function(sceneObjects)
 							sceneObjects[i, "ytopleft"],
 							sceneObjects[i, "xbottomright"],
 							sceneObjects[i, "ybottomright"]))
-			state["diagRight"] <- 3
+			state["diagRight"] <- 2
 	}
 	
 	if (abs(leftedge) < 2)
@@ -122,81 +124,110 @@ getStateDesc <- function(sceneObjects)
 	state
 }
 
-getReward <- function(state, action, hitObjects)
+#getReward <- function(state, action, hitObjects)
+getReward <- function(curState, nextState, action, hitObjects)
 {
 	# action 1 - nothing
 	# action 2 - steer left
 	# action 3 - steer right
 	# action 4 - speed up
 	# action 5 - speed down
-	reward <- (-1)
-	
+	reward <- (0)
+	#cat(hitObjects)
 	#cat('action', action, ', ')
+	
+	if('fuel' %in% hitObjects) {
+		reward <- reward + 100000
+	}
+	
+	if('leftside' %in% hitObjects) {
+		reward <- reward - 100000
+	}
+	
+	if('rightside' %in% hitObjects) {
+		reward <- reward - 100000
+	}
+	
+	if('car' %in% hitObjects) {
+		reward <- reward - 100000
+	}
+	
 	
 	#nothing
 	if(action == 1) {
-		#cat('nothing')
-		if (state['front'] == 2 && state['left'] == 2 && state['right'] == 2) {
-			reward <- (10)
+		##cat('nothing')
+		if(curState['front'] == 2) {
+			if(curState['diagLeft'] == 2 || curState['diagRight'] == 2) {
+				reward <- reward + 250
+			} else {
+				reward <- reward + 100
+			}
 		} else {
-			reward <- (-50)
+			reward <- reward + (-10000)
 		}
 	}
 	
 	#steer left
 	if(action == 2) {
 		#cat('left')
-		if(state['left'] == 2 || state['diagLeft'] == 2) {
-			reward <- (-400)
-		} else if (state['left'] == 3 || state['diagRight'] == 3) {
-			reward <- 100
+		if(curState['left'] == 2) {
+			reward <- reward + (-10000)
+		} else if (curState['left'] == 3 || curState['diagLeft'] == 3) {
+			reward <- reward + 500
+		} else if(curState['front'] == 2 && nextState['left']) {
+			if(curState['diagLeft'] == 1)
+				reward <- reward + 300
+			else 
+				reward <- reward + 200
 		} else {
-			reward <- -10
+			reward <- reward + (-10)
 		}
 	}
 	
 	#steer right
 	if(action == 3) {
 		#cat('right')
-		if(state['right'] == 2 || state['diagRight'] == 2) {
-			reward <- (-400)
-		} else if (state['right'] == 3 || state['diagRight'] == 3) {
-			reward <- 100
-		}else {
-			reward <- -10
+		if(curState['right'] == 2) {
+			reward <- reward + (-10000)
+		} else if (curState['right'] == 3 || curState['diagRight'] == 3) {
+			reward <- reward + 500			
+		}else if(curState['front'] == 2 && nextState['right'] == 1) {
+			if(curState['diagRight'] == 1)
+				reward <- reward + 300
+			else 
+			reward <- reward + (200)
+		} else {
+			reward <- reward + (-10)
 		}
 	}
 	
 	#speed up
 	if(action == 4) {
 		#cat('speed++')
-		if(state['front'] == 2) {
-			reward <- (-200)
-		} else if(state['diagLeft'] == 2 || state['diagRight'] == 2){
-			reward <- -50
-		} else if(state['front'] == 1 && state['diagLeft'] == 1 && state['diagRight'] == 1) {
-			reward <- 100
+		if(curState['front'] == 1) {
+			if(curState['diagLeft'] == 1 || curState['diagRight'] == 1)
+				reward <- reward + (300)
+			else
+				reward <- reward + (200)
 		} else {
-			reward <- (50)
+			reward <- reward + (-10000)
 		}
 	}
 	
 	#speed down
 	if(action == 5) {
 		#cat('speed--')
-		if(state['front'] == 2) {
-			reward <- 400
-		}else  if (state['front'] == 1){
-			reward <- (-400)
+		if(curState['front'] == 2) {
+			if(curState['diagLeft'] == 2 || curState['diagRight'] == 2)
+				reward <- reward + (300)
+			else
+				reward <- reward + (200)
 		} else {
-			reward <- (-50)
+			reward <- reward + (-10000)
 		}
 	}
 	#cat(' ', reward, '\n')
-	
-	if(length(match('fuel', hitObjects)) > 0) {
-		reward <- reward + 1000
-	}
+	flush.console()
 	
 	reward
 }
