@@ -15,7 +15,7 @@ getStateDesc <- function(sceneObjects)
 	for (i in sel)
 	{
 		if (isOverlapped(	sceneObjects[1, "xtopleft"], 
-                            sceneObjects[1, "ytopleft"] + CARLENGTH * 2,
+                            sceneObjects[1, "ytopleft"] + CARLENGTH,
                             sceneObjects[1, "xbottomright"],
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[i, "xtopleft"], 
@@ -24,7 +24,7 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ybottomright"]))
 				state["front"] <- 3
 	
-		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH * 2, 
+		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH, 
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[1, "xtopleft"],
                             sceneObjects[1, "ybottomright"],
@@ -34,8 +34,8 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ybottomright"]))
 				state["left"] <- 3
 		
-		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH * 2, 
-                            sceneObjects[1, "ytopleft"] + CARLENGTH * 2,
+		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH, 
+                            sceneObjects[1, "ytopleft"] + CARLENGTH,
                             sceneObjects[1, "xtopleft"],
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[i, "xtopleft"], 
@@ -46,7 +46,7 @@ getStateDesc <- function(sceneObjects)
 		
 		if (isOverlapped(	sceneObjects[1, "xbottomright"], 
                             sceneObjects[1, "ytopleft"],
-                            sceneObjects[1, "xbottomright"] + CARWIDTH * 2,
+                            sceneObjects[1, "xbottomright"] + CARWIDTH,
                             sceneObjects[1, "ybottomright"],
                             sceneObjects[i, "xtopleft"], 
                             sceneObjects[i, "ytopleft"],
@@ -55,8 +55,8 @@ getStateDesc <- function(sceneObjects)
 			state["right"] <- 3
 		
 		if (isOverlapped(	sceneObjects[1, "xbottomright"], 
-							sceneObjects[1, "ytopleft"] + CARLENGTH * 2,
-							sceneObjects[1, "xbottomright"] + CARWIDTH * 2,
+							sceneObjects[1, "ytopleft"] + CARLENGTH,
+							sceneObjects[1, "xbottomright"] + CARWIDTH,
 							sceneObjects[1, "ytopleft"],
 							sceneObjects[i, "xtopleft"], 
 							sceneObjects[i, "ytopleft"],
@@ -68,7 +68,7 @@ getStateDesc <- function(sceneObjects)
 	for (i in sel)
 	{
 		if (isOverlapped(sceneObjects[1, "xtopleft"], 
-                             sceneObjects[1, "ytopleft"] + CARLENGTH * 2,
+                             sceneObjects[1, "ytopleft"] + CARLENGTH,
                              sceneObjects[1, "xbottomright"],
                              sceneObjects[1, "ytopleft"],
                              sceneObjects[i, "xtopleft"], 
@@ -77,7 +77,7 @@ getStateDesc <- function(sceneObjects)
                              sceneObjects[i, "ybottomright"]))
 			state["front"] <- 2
 
-		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH * 2, 
+		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH, 
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[1, "xtopleft"],
                             sceneObjects[1, "ybottomright"],
@@ -86,8 +86,8 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "xbottomright"],
                             sceneObjects[i, "ybottomright"]))
 			state["left"] <- 2
-		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH * 2, 
-                            sceneObjects[1, "ytopleft"] + CARLENGTH * 2,
+		if (isOverlapped(	sceneObjects[1, "xtopleft"] - CARWIDTH, 
+                            sceneObjects[1, "ytopleft"] + CARLENGTH,
                             sceneObjects[1, "xtopleft"],
                             sceneObjects[1, "ytopleft"],
                             sceneObjects[i, "xtopleft"], 
@@ -98,7 +98,7 @@ getStateDesc <- function(sceneObjects)
 
 		if (isOverlapped(	sceneObjects[1, "xbottomright"], 
                             sceneObjects[1, "ytopleft"],
-                            sceneObjects[1, "xbottomright"] + CARWIDTH * 2,
+                            sceneObjects[1, "xbottomright"] + CARWIDTH,
                             sceneObjects[1, "ybottomright"],
                             sceneObjects[i, "xtopleft"], 
                             sceneObjects[i, "ytopleft"],
@@ -106,8 +106,8 @@ getStateDesc <- function(sceneObjects)
                             sceneObjects[i, "ybottomright"]))
 			state["right"] <- 2
 		if (isOverlapped(	sceneObjects[1, "xbottomright"], 
-							sceneObjects[1, "ytopleft"] + CARLENGTH * 2,
-							sceneObjects[1, "xbottomright"] + CARWIDTH * 2,
+							sceneObjects[1, "ytopleft"] + CARLENGTH,
+							sceneObjects[1, "xbottomright"] + CARWIDTH,
 							sceneObjects[1, "ytopleft"],
 							sceneObjects[i, "xtopleft"], 
 							sceneObjects[i, "ytopleft"],
@@ -157,9 +157,11 @@ getReward <- function(curState, nextState, action, hitObjects)
 	if(action == 1) {
 		##cat('nothing')
 		if(curState['front'] == 2) {
-			reward <- reward + 200
-		} else {
-			reward <- reward + (-10000)
+			if(curState['diagLeft'] == 2 || curState['diagRight'] == 2) {
+				reward <- reward + 250
+			} else {
+				reward <- reward + 100
+			}
 		}
 	}
 	
@@ -168,7 +170,7 @@ getReward <- function(curState, nextState, action, hitObjects)
 		#cat('left')
 		if(curState['left'] == 2 || curState['diagRight'] == 2 || nextState['left'] == 2 || nextState['diagLeft'] == 2) {
 			reward <- reward + (-10000)
-		} else if (curState['diagLeft'] == 3 || curState['left'] == 3) { #nextState['diagLeft/left']
+		} else if (nextState['left'] == 3 || curState['diagLeft'] == 3 || curState['left'] == 3 || nextState['diagLeft'] == 3) {
 			reward <- reward + 500
 		} else if(curState['front'] == 2 && curState['left'] == 1) {
 			#if(nextState['diagLeft'] == 1 && nextState['left'] == 1)
@@ -183,7 +185,7 @@ getReward <- function(curState, nextState, action, hitObjects)
 		#cat('right')
 		if(curState['right'] == 2 || curState['diagRight'] == 2 || nextState['right'] == 2 || nextState['diagRight'] == 2) {
 			reward <- reward + (-10000)
-		} else if (curState['diagRight'] == 3 || curState['right'] == 3) {#nextState['diagRight/right']
+		} else if (nextState['right'] == 3 || curState['diagRight'] == 3 || curState['right'] == 3 || nextState['diagRight'] == 3) {
 			reward <- reward + 500			
 		}else if(curState['front'] == 2 && curState['right'] == 1) {
 			#if(nextState['diagRight'] == 1 && nextState['right'] == 1)
@@ -210,10 +212,10 @@ getReward <- function(curState, nextState, action, hitObjects)
 	if(action == 5) {
 		#cat('speed--')
 		if(curState['front'] == 2) {
-			#if(curState['diagLeft'] == 2 || curState['diagRight'] == 2)
-			#	reward <- reward + 500
-			#else
-				reward <- reward + 400
+			if(curState['diagLeft'] == 2 || curState['diagRight'] == 2)
+				reward <- reward + 500
+			else
+				reward <- reward + 300
 		} else {
 			reward <- reward + (-10000)
 		}
