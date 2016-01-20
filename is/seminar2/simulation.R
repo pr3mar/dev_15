@@ -451,7 +451,7 @@ simulation <- function(qmat)
 		action <- selectAction(state, qmat)
 		
 		simData <- simulationStep(simData, action)
-		simulationDraw(simData)	
+		#simulationDraw(simData)	
 	}
 
 	as.numeric(simData$distance)
