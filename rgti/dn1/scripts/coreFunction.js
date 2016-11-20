@@ -196,7 +196,7 @@ function castToGL(array, vertex) {
     tmpVector[3] = 1;
     if(vertex) {
         vec4.normalize(tmpVector, tmpVector);
-        console.log(tmpVector);
+        //console.log(tmpVector);
     }
     return tmpVector;
 }
@@ -210,6 +210,7 @@ function startWorking() {
     transformations = [0.0, 0.0, 0.0, 100.0, -100.0, 100.0, 0.0, 0.0, 0.0];
     parse(fileContent);
     mat4.multiply(mvMatrix, scale(100, -100, 100), mvMatrix); // set scaling
+    //mat4.multiply(mvMatrix, scale(1, -1, 1), mvMatrix); // set scaling
     draw();
 }
 
@@ -219,17 +220,20 @@ function draw() {
         var tmp = mat4.create();
         if(rotateCoord) {
             // ------------------ | rotate on model rotation point
+            //console.log(transformations);
+            mat4.multiply(tmp, scale(transformations[3], transformations[4], transformations[5]), tmp);
             mat4.multiply(tmp, rotateX(transformations[0]), tmp);
             mat4.multiply(tmp, rotateY(transformations[1]), tmp);
             mat4.multiply(tmp, rotateZ(transformations[2]), tmp);
-            mat4.multiply(tmp, scale(transformations[3], transformations[4], transformations[5]), tmp);
             mat4.multiply(tmp, translate(transformations[6], transformations[7], transformations[8]), tmp);
             mat4.multiply(tmp, translate(0, 0, -8), tmp);
             if(enPerspective) { // prosim mi sporocite kje je napaka
-                //console.log("[model] perspective enabled");
-                mat4.multiply(tmp, perspective(perspectiveVal), tmp);
+                //console.log("[world] perspective enabled");
+                mat4.multiply(tmp, perspective(perspectiveVal), tmp); // set perspective
             }
+
             mat4.multiply(tmp, translate(canvas.width / 2, canvas.height / 2, 0), tmp);
+
         } else {
             // ------------------ | rotate in world
             mat4.multiply(tmp, translate(0, 0, -8), mvMatrix); // set camera
@@ -261,15 +265,17 @@ function drawLine(dot1, dot2) {
 function transform(matrix, vector) {
     //console.log(vector);
     var transformation = vec4.create();
+    //console.log(matrix);
     vec4.transformMat4(transformation, vector, matrix);
     // normalize? how?
-    if(transformation[3] != 1) {
+    console.log('before:', transformation);
+    if(transformation[3] != 1 && transformation[3] != 0) {
         transformation[0] /= transformation[3];
         transformation[1] /= transformation[3];
         transformation[2] /= transformation[3];
         transformation[3] /= transformation[3];
     }
-    //console.log(transformation);
+    console.log('after:', transformation);
     return transformation;
 }
 
@@ -329,11 +335,13 @@ function rotateZ(alpha) {
     mat4.transpose(rotateZMatrix, rotateZMatrix);
     return rotateZMatrix;
 }
-//<mat4> perspective(<float> d); // primerna vrednost je d=4
+//<mat4> perspective(<float> d);
+// primerna vrednost je d=4
 function perspective(d){
     var perspectiveMatrix = mat4.create();
     perspectiveMatrix[15] = 0;
     perspectiveMatrix[14] = -1 / d;
     mat4.transpose(perspectiveMatrix, perspectiveMatrix);
+    console.log("perspective: ", perspectiveMatrix);
     return perspectiveMatrix;
 }

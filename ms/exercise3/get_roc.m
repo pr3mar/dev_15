@@ -6,7 +6,7 @@ function [ R, auc, tsh, f, point] = get_roc( scores, groundworth )
     TP = 0; FP = 0; TPp = 0; FPp = 0; 
     p = length(groundworth(groundworth > 0)); n = length(groundworth) - p;
     point = [0.0 0.0]; minDist = 1000; tsh = 0;
-    counter = 1;
+    counter = 1; 
     for i = 1:length(groundworth)
         if fprev ~= scores(i)
             auc = auc + trapezoid_area(FP, FPp, TP, TPp);
@@ -40,13 +40,13 @@ function [ R, auc, tsh, f, point] = get_roc( scores, groundworth )
     apply_tsh = scores >= tsh;
     TP = 0; FP = 0;
     for i = 1:numel(apply_tsh)
-        if apply_tsh(i) == 1 && apply_tsh(i) == groundworth(i)
+        if apply_tsh(i) == 1 && apply_tsh(i) == groundworth(indices(i))
             TP = TP + 1;
-        elseif apply_tsh(i) == 0 && apply_tsh(i) == groundworth(i)
+        elseif apply_tsh(i) == 0 && apply_tsh(i) == groundworth(indices(i))
             FP = FP + 1;
         end
     end
-    p = length(apply_tsh(scores >= tsh)); n = length(apply_tsh) - p;
+%     p = length(apply_tsh(scores >= tsh)); n = length(apply_tsh) - p;
     precision = TP/(TP + FP);
     recall = TP/p;
     f = 2*(precision * recall)/(precision + recall);
